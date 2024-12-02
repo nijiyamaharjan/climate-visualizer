@@ -35,9 +35,9 @@ export default function MapComponent() {
             mouseover: (e) => {
                 const popupContent = `
                     ${feature.properties.DISTRICT ? 
-                    `District: ${feature.properties.DISTRICT}<br>Headquarters: ${feature.properties.HQ}<br>Province: ${feature.properties.PROVINCE}<br>Temperature: ${feature.properties.temperature}` 
+                    `District: ${feature.properties.DISTRICT}<br>Temperature: ${feature.properties.temperature}` 
                     : 
-                    `Name: ${feature.properties.name}<br>Capital: ${feature.properties.capital}<br>Temperature: ${feature.properties.temperature}`}
+                    `Province: ${feature.properties.name}<br>Temperature: ${feature.properties.temperature}`}
                     
                 `;
                 highlightFeature(e.target);
