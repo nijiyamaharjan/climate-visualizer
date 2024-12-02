@@ -6,7 +6,8 @@
         "properties": {
           "id": 1,
           "name": "Province No. 1",
-          "capital": "Biratnagar"
+          "capital": "Biratnagar",
+          "temperature": 11
         },
         "geometry": {
           "type": "Polygon",
@@ -12385,7 +12386,8 @@
         "properties": {
           "id": 2,
           "name": "Province No. 2",
-          "capital": "Janakpur"
+          "capital": "Janakpur",
+          "temperature": 22
         },
         "geometry": {
           "type": "Polygon",
@@ -19628,7 +19630,8 @@
         "properties": {
           "id": 3,
           "name": "Bagmati",
-          "capital": "Hetauda"
+          "capital": "Hetauda",
+          "temperature": 33
         },
         "geometry": {
           "type": "Polygon",
@@ -30439,7 +30442,8 @@
         "properties": {
           "id": 4,
           "name": "Gandaki",
-          "capital": "Pokhara"
+          "capital": "Pokhara",
+          "temperature": 44
         },
         "geometry": {
           "type": "Polygon",
@@ -42186,7 +42190,8 @@
         "properties": {
           "id": 5,
           "name": "Lumbini",
-          "capital": "Deukhuri"
+          "capital": "Deukhuri",
+          "temperature": 55
         },
         "geometry": {
           "type": "MultiPolygon",
@@ -54039,7 +54044,8 @@
         "properties": {
           "id": 6,
           "name": "Karnali",
-          "capital": "Birendranagar"
+          "capital": "Birendranagar",
+          "temperature": 66
         },
         "geometry": {
           "type": "Polygon",
@@ -70486,7 +70492,8 @@
         "properties": {
           "id": 7,
           "name": "Sudurpashchim",
-          "capital": "Godawari"
+          "capital": "Godawari",
+          "temperature": 77
         },
         "geometry": {
           "type": "Polygon",
