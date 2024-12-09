@@ -88,7 +88,7 @@ export default function MapComponent() {
     }
 
     return (
-        <div className="relative w-full h-screen">
+        <div className="relative w-full h-[500px]">
             <MapContainer
                 className="absolute w-full h-full z-0 top-0"
                 center={[28.3949, 84.1240]}
