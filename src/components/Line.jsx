@@ -8,10 +8,16 @@ const sampleData = [
     { month: 'Mar', temperature: 30 },
     { month: 'Apr', temperature: 35 },
     { month: 'May', temperature: 40 },
-    { month: 'Jun', temperature: 38 }
+    { month: 'Jun', temperature: 38 },
+    { month: 'Jul', temperature: 32 },
+    { month: 'Aug', temperature: 36 },
+    { month: 'Sep', temperature: 20 },
+    { month: 'Oct', temperature: 24 },
+    { month: 'Nov', temperature: 28 },
+    { month: 'Dec', temperature: 22 },
 ];
 
-export default function TemperatureChart({ selectedRegion }) {
+export default function LineChartComponent({ selectedRegion }) {
     return (
         <div className="bg-white p-4 rounded-lg shadow-md mb-4">
             <div className="flex items-center mb-4">

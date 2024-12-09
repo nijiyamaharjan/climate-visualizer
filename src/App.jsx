@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import Map from './components/Map';
-import TemperatureChart from './components/TemperatureChart';
+import TemperatureChart from './components/Line';
 import DataDownloader from './components/DataDownloader';
 import DataSelector from './components/Dropdown';
+import LineChartComponent from './components/Line'
+import BarChartComponent from './components/Bar';
 
 export default function App() {
   const [selectedRegion, setSelectedRegion] = useState(null);
@@ -21,8 +23,8 @@ export default function App() {
           </div>
           
           <div className="grid grid-cols-2 gap-6">
-            <TemperatureChart selectedRegion={selectedRegion} />
-            <TemperatureChart selectedRegion={selectedRegion} />
+            <LineChartComponent selectedRegion={selectedRegion} />
+            <BarChartComponent selectedRegion={selectedRegion} />
             <div className="col-span-2">
               <DataDownloader selectedRegion={selectedRegion} />
             </div>
