@@ -8,24 +8,12 @@
     "Temperature": 61.498949112133815
   },
   {
-    "District": "MORANG",
-    "Temperature": 44.51582427846789
-  },
-  {
     "District": "SUNSARI",
     "Temperature": 30.106412579719812
   },
   {
     "District": "SANKHUWASABHA",
     "Temperature": 42.08934429198333
-  },
-  {
-    "District": "SAPTARI",
-    "Temperature": 53.91473820665779
-  },
-  {
-    "District": "SIRAHA",
-    "Temperature": 69.25283401078418
   },
   {
     "District": "SOLUKHUMBU",
@@ -92,6 +80,10 @@
     "Temperature": 33.156118984135944
   },
   {
+    "District": "NAWALPUR",
+    "Temperature": 75.19004776901825
+  },
+  {
     "District": "PARASI",
     "Temperature": 70.5170009711733
   },
@@ -112,16 +104,16 @@
     "Temperature": 54.35062776135537
   },
   {
-    "District": "WESTERN",
-    "Temperature": 30.857514643745763
-  },
-  {
-    "District": "SALYAN",
-    "Temperature": 43.52219649421512
+    "District": "DOLPA",
+    "Temperature": 14.007585240822582
   },
   {
     "District": "HUMLA",
     "Temperature": 10.847506714120172
+  },
+  {
+    "District": "JUMLA",
+    "Temperature": 2.407818206301986
   },
   {
     "District": "KALIKOT",

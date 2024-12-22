@@ -1,89 +1,75 @@
 const puppeteer = require('puppeteer');
-
-const mapContainer = '.leaflet-container';
-const linechartContainer = '.linechart';
-const barchartContainer = '.barchart';
 const fs = require('fs');
 
-(async () => {
-  // Create a browser instance
-  const browser = await puppeteer.launch();
+const SELECTORS = {
+    mapContainer: '.leaflet-container',
+    linechartContainer: '.linechart',
+    barchartContainer: '.barchart',
+    interactiveElements: '.leaflet-interactive',
+    tooltipContent: '.leaflet-popup-content',
+};
 
-  // Create a new page
-  const page = await browser.newPage();
+const OUTPUT_DIR = './screenshots';
 
-  // Set viewport width and height
-  await page.setViewport({ width: 1280, height: 720 });
+async function initializeBrowser() {
+    return await puppeteer.launch();
+}
 
-  const website_url = 'http://localhost:5173/';
+async function captureScreenshot(page, selector, filePath) {
+    await page.waitForSelector(selector);
+    const element = await page.$(selector);
+    await element.screenshot({ path: filePath });
+}
 
-  // Open URL in current page
-  await page.goto(website_url);
-  await page.waitForSelector(mapContainer);
+async function scrapeMapData(page) {
+    const elements = await page.$$(SELECTORS.interactiveElements);
+    let data = [];
 
-  const map = await page.$(mapContainer);
-
-  // Capture screenshot
-  await map.screenshot({
-    path: './screenshots/map.jpg',
-  });
-
-
-  await page.goto(website_url);
-  await page.waitForSelector(linechartContainer);
-
-  const linechart = await page.$(linechartContainer);
-
-  // Capture screenshot
-  await linechart.screenshot({
-    path: './screenshots/linechart.jpg',
-  });
-
-
-  await page.goto(website_url);
-  await page.waitForSelector(barchartContainer);
-
-  const barchart = await page.$(barchartContainer);
-
-  // Capture screenshot
-  await barchart.screenshot({
-    path: './screenshots/barchart.jpg',
-  });
-
-  const elements = await page.$$('.leaflet-interactive');
-
-  let data = [];
-
-    // Hover over each element and extract tooltip content
     for (let element of elements) {
-
-        // Hover over the element
         await element.hover();
+        await page.waitForSelector(SELECTORS.tooltipContent);
+        const tooltipContent = await page.$eval(SELECTORS.tooltipContent, el => el.textContent);
 
-        // Wait for the tooltip to appear (adjust selector if needed)
-        await page.waitForSelector('.leaflet-popup-content');
-
-        // Extract tooltip content
-        const tooltipContent = await page.$eval('.leaflet-popup-content', el => el.textContent);
-
-        const cleanedContent = tooltipContent.replace(/\s+/g, ' ').trim(); // Remove extra spaces and \n
+        const cleanedContent = tooltipContent.replace(/\s+/g, ' ').trim();
         const matches = cleanedContent.match(/District:\s*(\w+).*Temperature:\s*([\d.]+)/);
 
         if (matches) {
             const district = matches[1];
-            const temperature = parseFloat(matches[2]); // Convert temperature to a number
-
-            const exists = data.some(item => item.District === district);
-
-            if (!exists) {
+            const temperature = parseFloat(matches[2]);
+            if (!data.some(item => item.District === district)) {
                 data.push({ District: district, Temperature: temperature });
             }
-        }        
+        }
+    }
+    return data;
+}
+
+function saveDataToJson(data, filePath) {
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+}
+
+(async () => {
+    if (!fs.existsSync(OUTPUT_DIR)) {
+        fs.mkdirSync(OUTPUT_DIR);
     }
 
-    const filePath = './screenshots/scraped_data.json';
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+    const browser = await initializeBrowser();
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1280, height: 720 });
 
-  // Close the browser instance
-  await browser.close();
+    const websiteUrl = 'http://localhost:5173/';
+    await page.goto(websiteUrl);
+
+    // Capture screenshots
+    await captureScreenshot(page, SELECTORS.mapContainer, `${OUTPUT_DIR}/map.jpg`);
+    await captureScreenshot(page, SELECTORS.linechartContainer, `${OUTPUT_DIR}/linechart.jpg`);
+    await captureScreenshot(page, SELECTORS.barchartContainer, `${OUTPUT_DIR}/barchart.jpg`);
+
+    // Scrape map data
+    const mapData = await scrapeMapData(page);
+    saveDataToJson(mapData, `${OUTPUT_DIR}/scraped_data.json`);
+
+    console.log('Screenshots and data have been saved successfully.');
+
+    await browser.close();
 })();
