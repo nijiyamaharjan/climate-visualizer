@@ -93,7 +93,7 @@ export default function MapComponent() {
                 className="absolute w-full h-full z-0 top-0"
                 center={[28.3949, 84.1240]}
                 maxBoundsViscosity={1.0}
-                zoom={6}
+                zoom={7}
                 zoomControl={true}
                 scrollWheelZoom={true}
             >

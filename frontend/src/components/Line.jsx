@@ -39,6 +39,7 @@ export default function LineChartComponent({ selectedRegion }) {
                         dataKey="temperature" 
                         stroke="#FF6384" 
                         activeDot={{ r: 8 }} 
+                        isAnimationActive={false}
                     />
                 </LineChart>
             </ResponsiveContainer>

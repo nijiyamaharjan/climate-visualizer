@@ -23,8 +23,12 @@ export default function App() {
           </div>
           
           <div className="grid grid-cols-2 gap-6">
-            <LineChartComponent selectedRegion={selectedRegion} />
-            <BarChartComponent selectedRegion={selectedRegion} />
+            <div className="linechart">
+              <LineChartComponent className="linechart" selectedRegion={selectedRegion} />
+            </div>
+            <div className="barchart">
+              <BarChartComponent className="barchart" selectedRegion={selectedRegion} />
+            </div>            
             <div className="col-span-2">
               <DataDownloader selectedRegion={selectedRegion} />
             </div>
