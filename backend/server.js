@@ -8,7 +8,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(cors({
-    origin: 'http://localhost:5173', 
+    origin: 'http://localhost:5173',
 }));
 
 app.use(bodyParser.json());
@@ -21,23 +21,51 @@ const pool = new Pool({
     port: process.env.DB_PORT,
 });
 
-// API endpoint to fetch tas_min data
+// Helper function to dynamically build SQL conditions
+const buildConditions = (baseQuery, params) => {
+    const conditions = [];
+    const values = [];
+
+    if (params.date) {
+        conditions.push(`t.timestamp::DATE = $${values.length + 1}`);
+        values.push(params.date);
+    }
+
+    if (params.startDate && params.endDate) {
+        conditions.push(`t.timestamp::DATE BETWEEN $${values.length + 1} AND $${values.length + 2}`);
+        values.push(params.startDate, params.endDate);
+    }
+
+    if (params.district) {
+        conditions.push(`d.district = $${values.length + 1}`);
+        values.push(params.district);
+    }
+
+    const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+    return {
+        query: `${baseQuery} ${whereClause};`,
+        values,
+    };
+};
+
+// Existing route for fetching tas_min data for a single date
 app.get('/api/tasmin', async (req, res) => {
-    const { date } = req.query;
+    const { date, district } = req.query;
 
     if (!date) {
         return res.status(400).send({ error: 'Date is required' });
     }
 
     try {
-        const query = `
+        const baseQuery = `
             SELECT d.district, ST_AsGeoJSON(d.geom) AS geometry, t.value
             FROM district_boundaries d
             JOIN tas_min t
             ON d.district = t.district_name
-            WHERE t.timestamp::DATE = $1;
         `;
-        const result = await pool.query(query, [date]);
+        const { query, values } = buildConditions(baseQuery, { date, district });
+
+        const result = await pool.query(query, values);
         const geojson = {
             type: 'FeatureCollection',
             features: result.rows.map(row => ({
@@ -49,11 +77,66 @@ app.get('/api/tasmin', async (req, res) => {
                 },
             })),
         };
-        console.log(geojson.features.properties)
 
         res.json(geojson);
     } catch (error) {
         console.error('Error querying database:', error);
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
+});
+
+// New route for fetching tas_min data for a range of dates
+app.get('/api/tasmin-range', async (req, res) => {
+    const { startDate, endDate, district } = req.query;
+
+    if (!startDate || !endDate) {
+        return res.status(400).send({ error: 'Start date and end date are required' });
+    }
+
+    try {
+        const baseQuery = `
+            SELECT d.district, ST_AsGeoJSON(d.geom) AS geometry, t.timestamp, t.value
+            FROM district_boundaries d
+            JOIN tas_min t
+            ON d.district = t.district_name
+        `;
+        const { query, values } = buildConditions(baseQuery, { startDate, endDate, district });
+
+        const result = await pool.query(query, values);
+        const geojson = {
+            type: 'FeatureCollection',
+            features: result.rows.map(row => ({
+                type: 'Feature',
+                geometry: JSON.parse(row.geometry),
+                properties: {
+                    district: row.district,
+                    temperature: row.value,
+                    timestamp: row.timestamp,
+                },
+            })),
+        };
+
+        res.json(geojson);
+    } catch (error) {
+        console.error('Error querying database:', error);
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
+});
+
+// Route to fetch the list of districts
+app.get('/api/districts', async (req, res) => {
+    try {
+        const query = `
+            SELECT DISTINCT district
+            FROM district_boundaries
+            ORDER BY district ASC;
+        `;
+        const result = await pool.query(query);
+
+        const districts = result.rows.map(row => row.district);
+        res.json(districts);
+    } catch (error) {
+        console.error('Error querying database for districts:', error);
         res.status(500).send({ error: 'Internal Server Error' });
     }
 });

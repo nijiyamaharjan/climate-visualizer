@@ -3,11 +3,17 @@ import Map from './components/Map';
 import TemperatureChart from './components/Line';
 import DataDownloader from './components/DataDownloader';
 import DataSelector from './components/Dropdown';
-import LineChartComponent from './components/Line'
+import LineChartComponent from './components/Line';
 import BarChartComponent from './components/Bar';
 
 export default function App() {
   const [selectedRegion, setSelectedRegion] = useState(null);
+  const [selectedDistrict, setSelectedDistrict] = useState(null);
+  const [dateRange, setDateRange] = useState({ startDate: '', endDate: '' });
+
+  const handleDateChange = (updatedRange) => {
+    setDateRange(updatedRange); // Update date range
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
@@ -17,20 +23,35 @@ export default function App() {
         <div className="grid grid-rows-1 lg:grid-rows-2 gap-6">
           <div>
             <div className="py-5">
-            <Map onRegionSelect={setSelectedRegion} />
+              <Map onRegionSelect={setSelectedRegion} />
             </div>
-            <DataSelector/>
-          </div>
-          
+            <DataSelector
+              onDistrictChange={setSelectedDistrict}
+              onDateChange={handleDateChange} 
+            />
+          </div>        
           <div className="grid grid-cols-2 gap-6">
             <div className="linechart">
-              <LineChartComponent className="linechart" selectedRegion={selectedRegion} />
+              <LineChartComponent
+                className="linechart"
+                selectedRegion={selectedRegion}
+                selectedDistrict={selectedDistrict}
+                dateRange={dateRange}
+              />
             </div>
             <div className="barchart">
-              <BarChartComponent className="barchart" selectedRegion={selectedRegion} />
+              <BarChartComponent
+                className="linechart"
+                selectedRegion={selectedRegion}
+                selectedDistrict={selectedDistrict}
+                dateRange={dateRange}
+              />
             </div>            
             <div className="col-span-2">
-              <DataDownloader selectedRegion={selectedRegion} />
+              <DataDownloader
+                selectedRegion={selectedRegion}
+                selectedDistrict={selectedDistrict}
+              />
             </div>
           </div>
         </div>
