@@ -9,37 +9,37 @@ export default function MapComponent() {
     const geojsonRef = useRef();
 
     useEffect(() => {
-        // Import the GeoJSON file from the public folder
-        fetch('/districts.geojson')
-            .then((response) => response.json())
-            .then((data) => {
-                console.log('Loaded districts data');
+        // Fetch data from the backend
+        const fetchData = async () => {
+            try {
+                const response = await fetch(`http://localhost:5000/api/tasmin?date=2025-06-01`);
+                const data = await response.json();
                 setDistricts(data);
-            })
-            .catch(() => console.log('Error loading districts'));
+            } catch (error) {
+                console.error('Error fetching tasmin data:', error);
+            }
+        };
+    
+        fetchData();
     }, []);
+    
 
-    useEffect(() => {
-        // Import the GeoJSON file from the public folder
-        fetch('/provinces.geojson')
-            .then((response) => response.json())
-            .then((data) => {
-                console.log('Loaded provinces data');
-                setProvinces(data);
-            })
-            .catch(() => console.log('Error provinces GeoJSON'));
-    }, []);
+    // useEffect(() => {
+    //     // Import the GeoJSON file from the public folder
+    //     fetch('/provinces.geojson')
+    //         .then((response) => response.json())
+    //         .then((data) => {
+    //             console.log('Loaded provinces data');
+    //             setProvinces(data);
+    //         })
+    //         .catch(() => console.log('Error provinces GeoJSON'));
+    // }, []);
 
     const handleFeatureHover = (feature, layer) => {
         layer.on({
             mouseover: (e) => {
-                const popupContent = `
-                    ${feature.properties.DISTRICT ? 
-                    `District: ${feature.properties.DISTRICT}<br>Temperature: ${feature.properties.temperature}` 
-                    : 
-                    `Province: ${feature.properties.name}<br>Temperature: ${feature.properties.temperature}`}
-                    
-                `;
+                const popupContent = 
+                    `District: ${feature.properties.district}<br>Temperature: ${feature.properties.temperature}` 
                 highlightFeature(e.target);
                 layer.bindPopup(popupContent).openPopup();
             },
@@ -51,15 +51,19 @@ export default function MapComponent() {
     };
 
     const getColor = (temperature) => {
-        return temperature > 70 ? '#800026' :
-               temperature > 60 ? '#BD0026' :
-               temperature > 50 ? '#E31A1C' :
-               temperature > 40 ? '#FC4E2A' :
-               temperature > 30 ? '#FD8D3C' :
-               temperature > 20 ? '#FEB24C' :
-               '#FED976';
-    };
-
+        // Convert Kelvin to Celsius
+        const tempCelsius = temperature - 273.15;
+    
+        // Apply color coding based on Celsius
+        return tempCelsius > 40 ? '#800026' : // Extremely hot (dark red)
+               tempCelsius > 30 ? '#BD0026' : // Very hot (red)
+               tempCelsius > 20 ? '#E31A1C' : // Warm (light red)
+               tempCelsius > 10 ? '#FC4E2A' : // Mild (orange)
+               tempCelsius > 0  ? '#FD8D3C' : // Cool (yellow-orange)
+               tempCelsius > -10 ? '#6BAED6' : // Cold (light blue)
+               '#08519C'; // Very cold (dark blue)
+    };    
+    
     const style = (feature) => {
         // Use temperature from the feature properties to get the color
         const temperature = feature.properties.temperature;
@@ -111,7 +115,7 @@ export default function MapComponent() {
                         )}
                     </LayersControl.Overlay>
 
-                    <LayersControl.Overlay name="Provinces">
+                    {/* <LayersControl.Overlay name="Provinces">
                         {provinces && (
                             <GeoJSON
                                 ref={geojsonRef}
@@ -120,7 +124,7 @@ export default function MapComponent() {
                                 onEachFeature={handleFeatureHover}
                             />
                         )}
-                    </LayersControl.Overlay>
+                    </LayersControl.Overlay> */}
                 </LayersControl>
             </MapContainer>
         </div>

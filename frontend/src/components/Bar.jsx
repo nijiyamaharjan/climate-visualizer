@@ -17,6 +17,7 @@ const sampleData = [
 ];
 
 const BarChartComponent = ({selectedRegion}) => {
+  
   return (
     <div>
       <ResponsiveContainer width="100%" height={500}>
