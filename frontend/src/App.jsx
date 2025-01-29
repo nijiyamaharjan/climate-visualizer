@@ -9,6 +9,7 @@ import BarChartComponent from './components/Bar';
 export default function App() {
   const [selectedRegion, setSelectedRegion] = useState(null);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
+  const [selectedVariable, setSelectedVariable] = useState('tas_min');
   const [dateRange, setDateRange] = useState({ startDate: '', endDate: '' });
 
   const handleDateChange = (updatedRange) => {
@@ -28,6 +29,7 @@ export default function App() {
             <DataSelector
               onDistrictChange={setSelectedDistrict}
               onDateChange={handleDateChange} 
+              onVariableChange={setSelectedVariable}
             />
           </div>        
           <div className="grid grid-cols-2 gap-6">
@@ -36,6 +38,7 @@ export default function App() {
                 className="linechart"
                 selectedRegion={selectedRegion}
                 selectedDistrict={selectedDistrict}
+                selectedVariable={selectedVariable}
                 dateRange={dateRange}
               />
             </div>
@@ -44,6 +47,7 @@ export default function App() {
                 className="linechart"
                 selectedRegion={selectedRegion}
                 selectedDistrict={selectedDistrict}
+                selectedVariable={selectedVariable}
                 dateRange={dateRange}
               />
             </div>            
@@ -51,6 +55,7 @@ export default function App() {
               <DataDownloader
                 selectedRegion={selectedRegion}
                 selectedDistrict={selectedDistrict}
+                selectedVariable={selectedVariable}
               />
             </div>
           </div>

@@ -5,21 +5,22 @@ import 'leaflet/dist/leaflet.css';
 export default function Map() {
     const [districts, setDistricts] = useState(null);
     const [selectedDate, setSelectedDate] = useState('2025-06-01');
+    const [selectedVariable, setSelectedVariable] = useState('tas_min'); 
     const geoJsonLayerRef = useRef(null);
 
-    const fetchData = async (date) => {
+    const fetchData = async (date, variable) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/tasmin?date=${date}`);
+            const response = await fetch(`http://localhost:5000/api/data?variable=${variable}&date=${date}`);
             const data = await response.json();
             setDistricts(data);
         } catch (error) {
-            console.error('Error fetching tasmin data:', error);
+            console.error(`Error fetching ${variable} data:`, error);
         }
     };
 
     useEffect(() => {
-        fetchData(selectedDate);
-    }, [selectedDate]);
+        fetchData(selectedDate, selectedVariable);
+    }, [selectedDate, selectedVariable]);
 
     // Update GeoJSON layer when districts data changes
     useEffect(() => {
@@ -27,17 +28,21 @@ export default function Map() {
             geoJsonLayerRef.current.clearLayers();
             geoJsonLayerRef.current.addData(districts);
         }
-    }, [districts]);
+    }, [districts, selectedVariable, selectedDate]);
 
     const handleDateChange = (selectedValue) => {
         const formattedDate = `${selectedValue}-01`;
         setSelectedDate(formattedDate);  
     };    
 
+    const handleVariableChange = (event) => {
+        setSelectedVariable(event.target.value);
+    };
+
     const handleFeatureHover = (feature, layer) => {
         layer.on({
             mouseover: (e) => {
-                const popupContent = `District: ${feature.properties.district}<br>Temperature: ${feature.properties.temperature}`;
+                const popupContent = `District: ${feature.properties.district}<br>${selectedVariable}: ${feature.properties[selectedVariable]}`;
                 highlightFeature(e.target);
                 layer.bindPopup(popupContent).openPopup();
             },
@@ -48,21 +53,39 @@ export default function Map() {
         });
     };
 
-    const getColor = (temperature) => {
-        const tempCelsius = temperature - 273.15;
-        return tempCelsius > 40 ? '#800026' :
-               tempCelsius > 30 ? '#BD0026' :
-               tempCelsius > 20 ? '#E31A1C' :
-               tempCelsius > 10 ? '#FC4E2A' :
-               tempCelsius > 0  ? '#FD8D3C' :
-               tempCelsius > -10 ? '#6BAED6' :
-               '#08519C';
+    const getColor = (value) => {
+        if (selectedVariable === "tas_min") {
+            const tempCelsius = value - 273.15;
+            return tempCelsius > 40 ? '#800026' :
+                   tempCelsius > 30 ? '#BD0026' :
+                   tempCelsius > 20 ? '#E31A1C' :
+                   tempCelsius > 10 ? '#FC4E2A' :
+                   tempCelsius > 0  ? '#FD8D3C' :
+                   tempCelsius > -10 ? '#6BAED6' :
+                   '#08519C';
+        } else if (selectedVariable === "sfc_windspeed") {
+            return value > 3.9 ? '#3E1A8E' :  // Dark purple
+           value > 3.8 ? '#5A2A9B' :  // Purple
+           value > 3.7 ? '#7F4AB8' :  // Soft purple
+           value > 3.6 ? '#9B6DCD' :  // Lighter purple
+           value > 3.5 ? '#B79FDC' :  // Very light purple
+           value > 3.4 ? '#D4C1E8' :  // Pale purple
+           value > 3.3 ? '#E8D7F4' :  // Light lavender
+           value > 3.2 ? '#F1E5FB' :  // Very light lavender
+           value > 3.1 ? '#D0D9F5' :  // Soft blue
+           value > 3 ? '#A3B9F2' :    // Lighter blue
+           value > 2.9 ? '#7DA9EE' :  // Medium blue
+           value > 2.8 ? '#539FE5' :  // Bright blue
+           value > 2.7 ? '#1F8FD5' :  // Darker blue
+           '#0F72B0';  
+        }
+        return '#cccccc'; // Default gray if undefined
     };
 
     const style = (feature) => {
-        const temperature = feature.properties.temperature;
+        const value = feature.properties[selectedVariable];
         return {
-            fillColor: getColor(temperature),
+            fillColor: getColor(value),
             weight: 2,
             opacity: 1,
             color: 'white',
@@ -108,7 +131,18 @@ export default function Map() {
                     onChange={(e) => handleDateChange(e.target.value)}
                     className="border rounded-md px-2 py-1"
                 />
-
+            <label htmlFor="variable-select" className="font-medium text-gray-700">
+                    Select Variable:
+                </label>
+                <select
+                    id="variable-select"
+                    value={selectedVariable}
+                    onChange={handleVariableChange}
+                    className="border rounded-md px-2 py-1"
+                >
+                    <option value="tas_min">Min Temperature (tas_min)</option>
+                    <option value="sfc_windspeed"> Surface Wind Speed (sfc_windspeed)</option>
+                </select>
             </div>
 
             <div className="relative w-full h-[500px]">
@@ -132,7 +166,7 @@ export default function Map() {
                                     data={districts}
                                     style={style}
                                     onEachFeature={handleFeatureHover}
-                                    key={selectedDate} // Force re-render when date changes
+                                    key={selectedVariable} // Force re-render when date changes
                                 />
                             )}
                         </LayersControl.Overlay>

@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, Tooltip, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer } from 'recharts';
 
-const BarChartComponent = ({ selectedRegion, selectedDistrict, dateRange }) => {
+const BarChartComponent = ({ selectedRegion, selectedDistrict, dateRange, selectedVariable }) => {
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchDataForRange = async (district, startDate, endDate) => {
-    if (!district || !startDate || !endDate) return; // Only fetch data if all values are selected
+  const fetchDataForRange = async (district, startDate, endDate, variable) => {
+    if (!district || !startDate || !endDate || !variable) return; // Only fetch data if all values are selected
 
     setLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:5000/api/tasmin-range?startDate=${startDate}&endDate=${endDate}&district=${district}`
+        `http://localhost:5000/api/data-range?startDate=${startDate}&endDate=${endDate}&district=${district}&variable=${variable}`
       );
       console.log(response);
       const geoJsonData = await response.json();
@@ -20,13 +20,13 @@ const BarChartComponent = ({ selectedRegion, selectedDistrict, dateRange }) => {
       const transformedData = geoJsonData.features
         .map((feature) => ({
           date: feature.properties.timestamp.split('T')[0],
-          temperature: Number((feature.properties.temperature - 273.15).toFixed(2)), // Convert Kelvin to Celsius with 2 decimal places
+          value: Number((feature.properties.value)), // Generalized for any variable
         }))
         .sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort by date
 
       setChartData(transformedData);
     } catch (error) {
-      console.error('Error fetching tasmin-range data:', error);
+      console.error('Error fetching data-range data:', error);
     } finally {
       setLoading(false);
     }
@@ -37,17 +37,20 @@ const BarChartComponent = ({ selectedRegion, selectedDistrict, dateRange }) => {
       fetchDataForRange(
         selectedDistrict,
         dateRange.startDate,
-        dateRange.endDate
+        dateRange.endDate,
+        selectedVariable
       );
     }
-  }, [selectedDistrict, dateRange.startDate, dateRange.endDate]);
+  }, [selectedDistrict, dateRange.startDate, dateRange.endDate, selectedVariable]);
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-4 border rounded shadow">
           <p className="text-sm font-medium">{`Date: ${label}`}</p>
-          <p className="text-sm text-red-500">{`Temperature: ${payload[0].value}°C`}</p>
+          <p className="text-sm text-red-500">
+            {`${selectedVariable}: ${payload[0].value}`}
+          </p>
         </div>
       );
     }
@@ -71,10 +74,17 @@ const BarChartComponent = ({ selectedRegion, selectedDistrict, dateRange }) => {
           <BarChart width={600} height={600} data={chartData}>
             <CartesianGrid stroke="#ccc" />
             <XAxis dataKey="date" tick={{ fontSize: 8 }} />
-            <YAxis />
+            <YAxis 
+              label={{ 
+                value: `${selectedVariable}`, // Dynamically show variable label
+                angle: -90, 
+                position: 'insideLeft',
+                style: { textAnchor: 'middle' }
+              }} 
+            />
             <Legend />
             <Bar
-              dataKey="temperature"
+              dataKey="value" // Use the generic `value` key for the selected variable
               fill="#FF6384"
               isAnimationActive={false}
               activeDot={false} // Remove default active dot styling

@@ -2,33 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { BsThermometerHalf } from 'react-icons/bs';
 
-export default function LineChartComponent({ selectedRegion, selectedDistrict, dateRange }) {
+export default function LineChartComponent({ selectedRegion, selectedDistrict, dateRange, selectedVariable }) {
     const [chartData, setChartData] = useState([]);
     const [loading, setLoading] = useState(false);
 
     // Function to fetch data for a specific region and date range
-    const fetchDataForRange = async (district, startDate, endDate) => {
-        if (!district || !startDate || !endDate) return; // Only fetch data if all values are selected
+    const fetchDataForRange = async (district, startDate, endDate, variable) => {
+        if (!district || !startDate || !endDate || !variable) return; // Only fetch data if all values are selected
 
         setLoading(true);
         try {
             const response = await fetch(
-                `http://localhost:5000/api/tasmin-range?startDate=${startDate}&endDate=${endDate}&district=${district}`
+                `http://localhost:5000/api/data-range?startDate=${startDate}&endDate=${endDate}&district=${district}&variable=${variable}`
             );
-            console.log(response)
             const geoJsonData = await response.json();
-
+            console.log(geoJsonData)
             // Transform GeoJSON features into chart data
             const transformedData = geoJsonData.features
                 .map((feature) => ({
                     date: feature.properties.timestamp.split('T')[0],
-                    temperature: Number((feature.properties.temperature - 273.15).toFixed(2)), // Convert Kelvin to Celsius with 2 decimal places
+                    value: Number((feature.properties.value)), // Generalized for any variable
                 }))
                 .sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort by date
-
+            console.log(transformedData)
             setChartData(transformedData);
         } catch (error) {
-            console.error('Error fetching tasmin-range data:', error);
+            console.error('Error fetching data-range data:', error);
         } finally {
             setLoading(false);
         }
@@ -40,10 +39,11 @@ export default function LineChartComponent({ selectedRegion, selectedDistrict, d
             fetchDataForRange(
                 selectedDistrict,
                 dateRange.startDate,
-                dateRange.endDate
+                dateRange.endDate,
+                selectedVariable
             );
         }
-    }, [selectedDistrict, dateRange.startDate, dateRange.endDate]);
+    }, [selectedDistrict, dateRange.startDate, dateRange.endDate, selectedVariable]);
 
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
@@ -51,7 +51,7 @@ export default function LineChartComponent({ selectedRegion, selectedDistrict, d
                 <div className="bg-white p-4 border rounded">
                     <p className="text-sm font-medium">{`Date: ${label}`}</p>
                     <p className="text-sm text-red-500">
-                        {`Temperature: ${payload[0].value}°C`}
+                        {`${selectedVariable}: ${payload[0].value}`}
                     </p>
                 </div>
             );
@@ -86,7 +86,7 @@ export default function LineChartComponent({ selectedRegion, selectedDistrict, d
                         />
                         <YAxis 
                             label={{ 
-                                value: 'Temperature (°C)', 
+                                value: `${selectedVariable}`, // Dynamically show variable label
                                 angle: -90, 
                                 position: 'insideLeft',
                                 style: { textAnchor: 'middle' }
@@ -96,8 +96,8 @@ export default function LineChartComponent({ selectedRegion, selectedDistrict, d
                         <Legend />
                         <Line 
                             type="monotone" 
-                            dataKey="temperature" 
-                            name="Temperature"
+                            dataKey="value" // Dynamically refer to the `value` key for any variable
+                            name={selectedVariable} // Dynamically update the legend based on the selected variable
                             stroke="#FF6384" 
                             dot={false}
                             activeDot={{ r: 6 }} 

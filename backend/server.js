@@ -49,8 +49,8 @@ const buildConditions = (baseQuery, params) => {
 };
 
 // Existing route for fetching tas_min data for a single date
-app.get('/api/tasmin', async (req, res) => {
-    const { date, district } = req.query;
+app.get('/api/data', async (req, res) => {
+    const { variable, date, district } = req.query;
 
     if (!date) {
         return res.status(400).send({ error: 'Date is required' });
@@ -60,7 +60,7 @@ app.get('/api/tasmin', async (req, res) => {
         const baseQuery = `
             SELECT d.district, ST_AsGeoJSON(d.geom) AS geometry, t.value
             FROM district_boundaries d
-            JOIN tas_min t
+            JOIN ${variable} t
             ON d.district = t.district_name
         `;
         const { query, values } = buildConditions(baseQuery, { date, district });
@@ -73,7 +73,7 @@ app.get('/api/tasmin', async (req, res) => {
                 geometry: JSON.parse(row.geometry),
                 properties: {
                     district: row.district,
-                    temperature: row.value,
+                    [variable] : row.value,
                 },
             })),
         };
@@ -86,21 +86,21 @@ app.get('/api/tasmin', async (req, res) => {
 });
 
 // New route for fetching tas_min data for a range of dates
-app.get('/api/tasmin-range', async (req, res) => {
-    const { startDate, endDate, district } = req.query;
+app.get('/api/data-range', async (req, res) => {
+    const { variable, date, startDate, endDate, district } = req.query;
 
-    if (!startDate || !endDate) {
-        return res.status(400).send({ error: 'Start date and end date are required' });
+    if (!variable) {
+        return res.status(400).send({ error: 'Variable is required' });
     }
 
     try {
         const baseQuery = `
             SELECT d.district, ST_AsGeoJSON(d.geom) AS geometry, t.timestamp, t.value
             FROM district_boundaries d
-            JOIN tas_min t
+            JOIN ${variable} t
             ON d.district = t.district_name
         `;
-        const { query, values } = buildConditions(baseQuery, { startDate, endDate, district });
+        const { query, values } = buildConditions(baseQuery, { date, startDate, endDate, district });
 
         const result = await pool.query(query, values);
         const geojson = {
@@ -110,7 +110,7 @@ app.get('/api/tasmin-range', async (req, res) => {
                 geometry: JSON.parse(row.geometry),
                 properties: {
                     district: row.district,
-                    temperature: row.value,
+                    value: row.value,
                     timestamp: row.timestamp,
                 },
             })),

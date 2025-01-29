@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
-const DataSelector = ({ onDistrictChange, onDateChange }) => {
+const DataSelector = ({ onDistrictChange, onDateChange, onVariableChange }) => {
   const [districts, setDistricts] = useState([]);
   const [dateRange, setDateRange] = useState({ startDate: '', endDate: '' });
-  const variables = ['Temperature', 'Rainfall', 'Humidity', 'Wind Speed'];
+  const [variable, setVariable] = useState('tas_min'); // Initial variable
+  const variables = ['tas_min', 'Rainfall', 'Humidity', 'sfc_windspeed'];
 
   const handleDateChange = (e) => {
     const { name, value } = e.target;
@@ -13,8 +14,14 @@ const DataSelector = ({ onDistrictChange, onDateChange }) => {
     const updatedRange = { ...dateRange, [name]: updatedValue };
     setDateRange(updatedRange); // Update the state with the new range
     onDateChange(updatedRange); // Notify parent of the change
-};
+  };
 
+  const handleVariableChange = (e) => {
+    const selectedVariable = e.target.value;
+    setVariable(selectedVariable); // Update the variable state
+    onVariableChange(selectedVariable); // Notify parent about the selected variable
+    console.log(variable)
+  };
 
   useEffect(() => {
     const fetchDistricts = async () => {
@@ -34,7 +41,11 @@ const DataSelector = ({ onDistrictChange, onDateChange }) => {
       <div>
         <h2 className="text-2xl font-bold text-center mb-2">Variable</h2>
         <div className="relative">
-          <select className="text-center text-xl appearance-none w-48 px-4 py-3 border-2 border-gray-300 rounded-lg font-bold">
+          <select
+            className="text-center text-xl appearance-none w-48 px-4 py-3 border-2 border-gray-300 rounded-lg font-bold"
+            value={variable} // Bind the variable state to the dropdown
+            onChange={handleVariableChange} // Update the variable when selection changes
+          >
             {variables.map((variable) => (
               <option key={variable} value={variable}>
                 {variable}
