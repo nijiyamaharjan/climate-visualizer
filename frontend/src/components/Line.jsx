@@ -1,49 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { BsThermometerHalf } from 'react-icons/bs';
+import { useDataRange } from '../hooks/useDataRange';
 
 export default function LineChartComponent({ selectedRegion, selectedDistrict, dateRange, selectedVariable }) {
-    const [chartData, setChartData] = useState([]);
-    const [loading, setLoading] = useState(false);
-
-    // Function to fetch data for a specific region and date range
-    const fetchDataForRange = async (district, startDate, endDate, variable) => {
-        if (!district || !startDate || !endDate || !variable) return; // Only fetch data if all values are selected
-
-        setLoading(true);
-        try {
-            const response = await fetch(
-                `http://localhost:5000/api/data-range?startDate=${startDate}&endDate=${endDate}&district=${district}&variable=${variable}`
-            );
-            const geoJsonData = await response.json();
-            console.log(geoJsonData)
-            // Transform GeoJSON features into chart data
-            const transformedData = geoJsonData.features
-                .map((feature) => ({
-                    date: feature.properties.timestamp.split('T')[0],
-                    value: Number((feature.properties.value)), // Generalized for any variable
-                }))
-                .sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort by date
-            console.log(transformedData)
-            setChartData(transformedData);
-        } catch (error) {
-            console.error('Error fetching data-range data:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Fetch data when either the selected district or date range changes, but only if all are selected
-    useEffect(() => {
-        if (selectedDistrict && dateRange.startDate && dateRange.endDate) {
-            fetchDataForRange(
-                selectedDistrict,
-                dateRange.startDate,
-                dateRange.endDate,
-                selectedVariable
-            );
-        }
-    }, [selectedDistrict, dateRange.startDate, dateRange.endDate, selectedVariable]);
+    const { chartData, loading, error } = useDataRange(selectedDistrict, dateRange, selectedVariable);
 
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
@@ -59,12 +19,31 @@ export default function LineChartComponent({ selectedRegion, selectedDistrict, d
         return null;
     };
 
+    // Calculate Y-axis domain based on data
+    const calculateYAxisDomain = () => {
+        if (chartData.length === 0) return [0, 1];
+
+        const values = chartData.map(item => item.value);
+        const minValue = Math.min(...values);
+        const maxValue = Math.max(...values);
+        const range = maxValue - minValue;
+        const padding = range * 0.5;
+
+        return [minValue - padding, maxValue + padding];
+    };
+
+    if (error) {
+        return (
+            <div className="bg-white p-4 rounded-lg mb-4">
+                <div className="flex justify-center items-center h-64">
+                    <p className="text-red-600">Error loading data: {error}</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="bg-white p-4 rounded-lg mb-4">
-            <div className="grid grid-cols-2 gap-4 mb-4">
-                {/* Empty space for now */}
-            </div>
-
             {loading ? (
                 <div className="flex justify-center items-center h-64">
                     <p className="text-gray-600">Loading data...</p>
@@ -75,7 +54,10 @@ export default function LineChartComponent({ selectedRegion, selectedDistrict, d
                 </div>
             ) : (
                 <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                    <LineChart 
+                        data={chartData} 
+                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    >
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis 
                             dataKey="date" 
@@ -85,19 +67,22 @@ export default function LineChartComponent({ selectedRegion, selectedDistrict, d
                             tick={{ fontSize: 12 }}
                         />
                         <YAxis 
+                            domain={calculateYAxisDomain()}
                             label={{ 
-                                value: `${selectedVariable}`, // Dynamically show variable label
+                                value: `${selectedVariable}`, 
                                 angle: -90, 
                                 position: 'insideLeft',
                                 style: { textAnchor: 'middle' }
-                            }} 
+                            }}
+                            tickFormatter={(value) => value.toFixed(3)}
+                            allowDataOverflow={true}
                         />
                         <Tooltip content={<CustomTooltip />} />
                         <Legend />
                         <Line 
                             type="monotone" 
-                            dataKey="value" // Dynamically refer to the `value` key for any variable
-                            name={selectedVariable} // Dynamically update the legend based on the selected variable
+                            dataKey="value"
+                            name={selectedVariable}
                             stroke="#FF6384" 
                             dot={false}
                             activeDot={{ r: 6 }} 
