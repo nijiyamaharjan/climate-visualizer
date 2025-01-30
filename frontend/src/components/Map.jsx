@@ -1,20 +1,26 @@
 import { MapContainer, TileLayer, GeoJSON, LayersControl } from 'react-leaflet';
 import React, { useState, useEffect, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
+import { toPng } from 'html-to-image'; 
 
 export default function Map() {
     const [districts, setDistricts] = useState(null);
     const [selectedDate, setSelectedDate] = useState('2025-06-01');
-    const [selectedVariable, setSelectedVariable] = useState('tas_min'); 
+    const [selectedVariable, setSelectedVariable] = useState('tas_min');
+    const [loading, setLoading] = useState(true); // Track loading state
     const geoJsonLayerRef = useRef(null);
+    const mapRef = useRef(null);
 
     const fetchData = async (date, variable) => {
         try {
+            setLoading(true); // Start loading
             const response = await fetch(`http://localhost:5000/api/data?variable=${variable}&date=${date}`);
             const data = await response.json();
             setDistricts(data);
         } catch (error) {
             console.error(`Error fetching ${variable} data:`, error);
+        } finally {
+            setLoading(false); // Stop loading once data is fetched
         }
     };
 
@@ -22,7 +28,6 @@ export default function Map() {
         fetchData(selectedDate, selectedVariable);
     }, [selectedDate, selectedVariable]);
 
-    // Update GeoJSON layer when districts data changes
     useEffect(() => {
         if (geoJsonLayerRef.current && districts) {
             geoJsonLayerRef.current.clearLayers();
@@ -32,8 +37,8 @@ export default function Map() {
 
     const handleDateChange = (selectedValue) => {
         const formattedDate = `${selectedValue}-01`;
-        setSelectedDate(formattedDate);  
-    };    
+        setSelectedDate(formattedDate);
+    };
 
     const handleVariableChange = (event) => {
         setSelectedVariable(event.target.value);
@@ -64,22 +69,22 @@ export default function Map() {
                    tempCelsius > -10 ? '#6BAED6' :
                    '#08519C';
         } else if (selectedVariable === "sfc_windspeed") {
-            return value > 3.9 ? '#3E1A8E' :  // Dark purple
-           value > 3.8 ? '#5A2A9B' :  // Purple
-           value > 3.7 ? '#7F4AB8' :  // Soft purple
-           value > 3.6 ? '#9B6DCD' :  // Lighter purple
-           value > 3.5 ? '#B79FDC' :  // Very light purple
-           value > 3.4 ? '#D4C1E8' :  // Pale purple
-           value > 3.3 ? '#E8D7F4' :  // Light lavender
-           value > 3.2 ? '#F1E5FB' :  // Very light lavender
-           value > 3.1 ? '#D0D9F5' :  // Soft blue
-           value > 3 ? '#A3B9F2' :    // Lighter blue
-           value > 2.9 ? '#7DA9EE' :  // Medium blue
-           value > 2.8 ? '#539FE5' :  // Bright blue
-           value > 2.7 ? '#1F8FD5' :  // Darker blue
+            return value > 3.9 ? '#3E1A8E' :  
+           value > 3.8 ? '#5A2A9B' :  
+           value > 3.7 ? '#7F4AB8' :  
+           value > 3.6 ? '#9B6DCD' :  
+           value > 3.5 ? '#B79FDC' :  
+           value > 3.4 ? '#D4C1E8' :  
+           value > 3.3 ? '#E8D7F4' :  
+           value > 3.2 ? '#F1E5FB' :  
+           value > 3.1 ? '#D0D9F5' :  
+           value > 3 ? '#A3B9F2' :  
+           value > 2.9 ? '#7DA9EE' :  
+           value > 2.8 ? '#539FE5' :  
+           value > 2.7 ? '#1F8FD5' :  
            '#0F72B0';  
         }
-        return '#cccccc'; // Default gray if undefined
+        return '#cccccc'; 
     };
 
     const style = (feature) => {
@@ -114,9 +119,40 @@ export default function Map() {
     }
 
     const nepalBounds = [
-        [26.347, 80.058],  // Southwest corner (lat, lon)
-        [30.447, 88.201]   // Northeast corner (lat, lon)
+        [26.347, 80.058],  
+        [30.447, 88.201]   
     ];
+
+    const exportMap = () => {
+        if (!mapRef.current || !districts) {
+            console.warn("Map or GeoJSON data is not fully loaded yet.");
+            return;
+        }
+
+        mapRef.current.setView([28.3949, 84.1240], 7);
+
+        mapRef.current.once('moveend', () => {
+            const mapContainer = mapRef.current.getContainer();
+            
+            toPng(mapContainer, {
+                quality: 1.0,
+                backgroundColor: 'white',
+                pixelRatio: 2, 
+                style: {
+                    transform: 'scale(1)', 
+                }
+            })
+            .then(function (dataUrl) {
+                const link = document.createElement('a');
+                link.download = 'nepal_map.png';
+                link.href = dataUrl;
+                link.click();
+            })
+            .catch(function (error) {
+                console.error('Error capturing map:', error);
+            });
+        });
+    };
 
     return (
         <div className="relative">
@@ -127,11 +163,11 @@ export default function Map() {
                 <input
                     id="date-picker"
                     type="month"
-                    value={selectedDate.slice(0, 7)} // Display only the month and year (YYYY-MM)
+                    value={selectedDate.slice(0, 7)}
                     onChange={(e) => handleDateChange(e.target.value)}
                     className="border rounded-md px-2 py-1"
                 />
-            <label htmlFor="variable-select" className="font-medium text-gray-700">
+                <label htmlFor="variable-select" className="font-medium text-gray-700">
                     Select Variable:
                 </label>
                 <select
@@ -148,16 +184,16 @@ export default function Map() {
             <div className="relative w-full h-[500px]">
                 <MapContainer
                     className="absolute w-full h-full z-0 top-0"
-                    center={[28.3949, 84.1240]} // Centered on Nepal
+                    center={[28.3949, 84.1240]} 
                     zoom={7}
                     zoomControl={true}
                     scrollWheelZoom={true}
-                    maxBounds={nepalBounds} // Restrict map to Nepal's bounds
-                    maxZoom={12}  // Set max zoom level
-                    minZoom={7}   // Set min zoom level
+                    maxBounds={nepalBounds} 
+                    maxZoom={12} 
+                    minZoom={7}   
+                    ref={mapRef}
                 >
                     <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png" />
-
                     <LayersControl position="topright">
                         <LayersControl.Overlay checked name="Districts">
                             {districts && (
@@ -166,13 +202,28 @@ export default function Map() {
                                     data={districts}
                                     style={style}
                                     onEachFeature={handleFeatureHover}
-                                    key={selectedVariable} // Force re-render when date changes
+                                    key={selectedVariable}
                                 />
                             )}
                         </LayersControl.Overlay>
                     </LayersControl>
                 </MapContainer>
             </div>
+
+            {/* Show loading indicator until data is ready */}
+            {loading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50">
+                    <div className="loader">Loading...</div>
+                </div>
+            )}
+
+            <button
+                onClick={exportMap}
+                disabled={loading} // Disable export button when loading
+                className={`mt-4 px-4 py-2 bg-blue-600 text-white rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+                Export as PNG
+            </button>
         </div>
     );
 }
