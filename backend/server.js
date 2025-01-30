@@ -6,6 +6,8 @@ const { Pool } = require('pg');
 const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs');
+const GIFEncoder = require('gifencoder');
+const { createCanvas, loadImage } = require('canvas');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -391,7 +393,6 @@ app.post('/api/generate-map-range', async (req, res) => {
         for (let date = new Date(start); date <= end; date.setMonth(date.getMonth() + 1)) {
             // Set the day to the 1st of the month (in case it's not already the 1st)
             date.setDate(1);
-            console.log(date)
             const dateStr = date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
             console.log("Generating map for:", dateStr); // Debugging line
             const screenshot = await generateMapForDate(dateStr);
@@ -637,6 +638,53 @@ app.get('/api/districts', async (req, res) => {
     }
 });
 
+// Helper function to generate GIF
+const generateGif = async () => {
+  const encoder = new GIFEncoder(600, 400); // Set width and height for the GIF
+  const outputPath = path.resolve(__dirname, 'maps', 'output.gif'); // Use absolute path for output GIF
+  
+  // Create an output stream
+  const writeStream = fs.createWriteStream(outputPath);
+  encoder.createReadStream().pipe(writeStream);
+  
+  encoder.start();
+  encoder.setRepeat(0); // 0 for infinite loop
+  encoder.setDelay(300); // 500ms between frames
+  
+  const mapsFolderPath = path.join(__dirname, 'maps');
+  const imageFiles = fs.readdirSync(mapsFolderPath).filter(file =>
+    /\.(png|jpg|jpeg|gif)$/i.test(file) // Filter image files
+  );
+  console.log('Image files:', imageFiles);
+  
+  // Iterate over the image files and add each image to the GIF
+  for (const file of imageFiles) {
+    const imagePath = path.join(mapsFolderPath, file);
+    const img = await loadImage(imagePath);
+  
+    const canvas = createCanvas(600, 400); // Set the canvas size
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, 600, 400); // Draw image on canvas
+    
+    encoder.addFrame(ctx);
+  }
+  
+  encoder.finish();
+  return outputPath;
+};
+
+// Create endpoint to generate GIF
+app.get('/api/generate-gif', async (req, res) => {
+  try {
+    const gifPath = await generateGif();
+    res.sendFile(gifPath); // Send the generated GIF to the client
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Error generating GIF');
+  }
+});
+
+  
 // Start the server
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
