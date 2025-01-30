@@ -1,7 +1,7 @@
 import { MapContainer, TileLayer, GeoJSON, LayersControl } from 'react-leaflet';
 import React, { useState, useEffect, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
-import { toPng } from 'html-to-image'; 
+import MapDownloader from './MapDownloader';
 
 export default function Map() {
     const [districts, setDistricts] = useState(null);
@@ -121,38 +121,7 @@ export default function Map() {
     const nepalBounds = [
         [26.347, 80.058],  
         [30.447, 88.201]   
-    ];
-
-    const exportMap = () => {
-        if (!mapRef.current || !districts) {
-            console.warn("Map or GeoJSON data is not fully loaded yet.");
-            return;
-        }
-
-        mapRef.current.setView([28.3949, 84.1240], 7);
-
-        mapRef.current.once('moveend', () => {
-            const mapContainer = mapRef.current.getContainer();
-            
-            toPng(mapContainer, {
-                quality: 1.0,
-                backgroundColor: 'white',
-                pixelRatio: 2, 
-                style: {
-                    transform: 'scale(1)', 
-                }
-            })
-            .then(function (dataUrl) {
-                const link = document.createElement('a');
-                link.download = 'nepal_map.png';
-                link.href = dataUrl;
-                link.click();
-            })
-            .catch(function (error) {
-                console.error('Error capturing map:', error);
-            });
-        });
-    };
+    ];   
 
     return (
         <div className="relative">
@@ -217,13 +186,10 @@ export default function Map() {
                 </div>
             )}
 
-            <button
-                onClick={exportMap}
-                disabled={loading} // Disable export button when loading
-                className={`mt-4 px-4 py-2 bg-blue-600 text-white rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-                Export as PNG
-            </button>
+            <MapDownloader 
+            variable={selectedVariable}
+            date={selectedDate}
+            />
         </div>
     );
 }
