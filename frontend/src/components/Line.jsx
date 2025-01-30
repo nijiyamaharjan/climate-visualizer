@@ -1,6 +1,29 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useDataRange } from '../hooks/useDataRange';
+import dayjs from 'dayjs';
+
+// Function to calculate the linear regression trend line
+const calculateTrendLine = (data) => {
+    const n = data.length;
+    const xValues = data.map((_, index) => index);
+    const yValues = data.map(item => item.value);
+
+    // Calculate sums needed for the regression formula
+    const sumX = xValues.reduce((acc, val) => acc + val, 0);
+    const sumY = yValues.reduce((acc, val) => acc + val, 0);
+    const sumXY = xValues.reduce((acc, val, idx) => acc + val * yValues[idx], 0);
+    const sumX2 = xValues.reduce((acc, val) => acc + val * val, 0);
+
+    // Calculate the slope (m) and intercept (b) for the trend line
+    const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+    const intercept = (sumY - slope * sumX) / n;
+
+    // Generate trend line data
+    return xValues.map(x => {
+        return { date: data[x].date, value: slope * x + intercept };
+    });
+};
 
 export default function LineChartComponent({ selectedRegion, selectedDistrict, dateRange, selectedVariable }) {
     const { chartData, loading, error } = useDataRange(selectedDistrict, dateRange, selectedVariable);
@@ -9,7 +32,7 @@ export default function LineChartComponent({ selectedRegion, selectedDistrict, d
         if (active && payload && payload.length) {
             return (
                 <div className="bg-white p-4 border rounded">
-                    <p className="text-sm font-medium">{`Date: ${label}`}</p>
+                    <p className="text-sm font-medium">{`Date: ${dayjs(label).format('MMM YYYY')}`}</p>
                     <p className="text-sm text-red-500">
                         {`${selectedVariable}: ${payload[0].value}`}
                     </p>
@@ -42,6 +65,9 @@ export default function LineChartComponent({ selectedRegion, selectedDistrict, d
         );
     }
 
+    // Calculate the trend line based on the chart data
+    const trendLineData = calculateTrendLine(chartData);
+
     return (
         <div className="bg-white p-4 rounded-lg mb-4">
             {loading ? (
@@ -65,6 +91,7 @@ export default function LineChartComponent({ selectedRegion, selectedDistrict, d
                             textAnchor="end"
                             height={70}
                             tick={{ fontSize: 12 }}
+                            tickFormatter={(tick) => dayjs(tick).format('MMM YYYY')} // Format tick as Month Year
                         />
                         <YAxis 
                             domain={calculateYAxisDomain()}
@@ -87,6 +114,17 @@ export default function LineChartComponent({ selectedRegion, selectedDistrict, d
                             dot={false}
                             activeDot={{ r: 6 }} 
                             isAnimationActive={false}
+                        />
+                        {/* Add the dotted trend line with lighter green color */}
+                        <Line 
+                            type="linear" 
+                            dataKey="value"
+                            data={trendLineData}  // Trend line data
+                            stroke="#90EE90"  // Lighter green color
+                            dot={false} 
+                            strokeWidth={2}
+                            isAnimationActive={false}
+                            strokeDasharray="5 5" // Dotted line
                         />
                     </LineChart>
                 </ResponsiveContainer>

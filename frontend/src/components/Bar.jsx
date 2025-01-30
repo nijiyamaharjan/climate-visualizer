@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, Tooltip, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer } from 'recharts';
 import { useDataRange } from '../hooks/useDataRange';
+import dayjs from 'dayjs'; // Import dayjs for date formatting
 
 const BarChartComponent = ({ selectedRegion, selectedDistrict, dateRange, selectedVariable }) => {
-    const { chartData, loading, error } = useDataRange(selectedDistrict, dateRange, selectedVariable);
+  const { chartData, loading, error } = useDataRange(selectedDistrict, dateRange, selectedVariable);
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -30,17 +31,17 @@ const BarChartComponent = ({ selectedRegion, selectedDistrict, dateRange, select
     const padding = range * 0.5;
 
     return [minValue - padding, maxValue + padding];
-};
+  };
 
-if (error) {
+  if (error) {
     return (
-        <div className="bg-white p-4 rounded-lg mb-4">
-            <div className="flex justify-center items-center h-64">
-                <p className="text-red-600">Error loading data: {error}</p>
-            </div>
+      <div className="bg-white p-4 rounded-lg mb-4">
+        <div className="flex justify-center items-center h-64">
+          <p className="text-red-600">Error loading data: {error}</p>
         </div>
+      </div>
     );
-}
+  }
 
   return (
     <div className="bg-white p-4 rounded-lg mb-4">
@@ -58,15 +59,19 @@ if (error) {
         <ResponsiveContainer width="100%" height={300}>
           <BarChart width={800} height={600} data={chartData}>
             <CartesianGrid stroke="#ccc" />
-            <XAxis dataKey="date" tick={{ fontSize: 8 }} />
-            <YAxis 
+            <XAxis
+              dataKey="date" 
+              tickFormatter={(tick) => dayjs(tick).format('MMM YYYY')} // Format tick as Month Year
+              tick={{ fontSize: 8 }}
+            />
+            <YAxis
               domain={calculateYAxisDomain()}
-              label={{ 
+              label={{
                 value: `${selectedVariable}`, // Dynamically show variable label
-                angle: -90, 
+                angle: -90,
                 position: 'insideLeft',
                 style: { textAnchor: 'middle' }
-              }} 
+              }}
               tickFormatter={(value) => value.toFixed(3)}
               allowDataOverflow={true}
             />
@@ -77,7 +82,7 @@ if (error) {
               fill="#FF6384"
               isAnimationActive={false}
               activeDot={false} // Remove default active dot styling
-            />           
+            />
           </BarChart>
         </ResponsiveContainer>
       )}
