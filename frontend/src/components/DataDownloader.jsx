@@ -1,28 +1,26 @@
 import React from 'react';
 import { BiDownload } from 'react-icons/bi';
 
-const sampleData = [
-    { month: 'Jan', temperature: 25 },
-    { month: 'Feb', temperature: 27 },
-    { month: 'Mar', temperature: 30 },
-    { month: 'Apr', temperature: 35 },
-    { month: 'May', temperature: 40 },
-    { month: 'Jun', temperature: 38 }
-];
-
-export default function DataDownloader({ selectedRegion }) {
+export default function DataDownloader({ selectedRegion, selectedDistrict, selectedVariable, chartData }) {
     const downloadCSV = () => {
+        // Check if there's data to download
+        if (!chartData || chartData.length === 0) {
+            alert('No data available to download.');
+            return;
+        }
+
+        // Format the chart data for CSV
         const csvContent = [
-            'Month,Temperature',
-            ...sampleData.map(row => `${row.month},${row.temperature}`)
+            'Date,Value', // Assuming each data point has a date and a value
+            ...chartData.map(row => `${row.date},${row.value}`)
         ].join('\n');
 
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
-        
+
         link.setAttribute('href', url);
-        link.setAttribute('download', `${selectedRegion?.name || 'region'}_temperatures.csv`);
+        link.setAttribute('download', `${selectedVariable || 'variable'}_data.csv`);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();

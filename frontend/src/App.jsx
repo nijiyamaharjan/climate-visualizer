@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import Map from './components/Map';
-import TemperatureChart from './components/Line';
 import DataDownloader from './components/DataDownloader';
 import DataSelector from './components/Dropdown';
 import LineChartComponent from './components/Line';
 import BarChartComponent from './components/Bar';
+import { useDataRange } from './hooks/useDataRange';
 
 export default function App() {
   const [selectedRegion, setSelectedRegion] = useState(null);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [selectedVariable, setSelectedVariable] = useState('tas_min');
   const [dateRange, setDateRange] = useState({ startDate: '', endDate: '' });
+  const { chartData, loading, error } = useDataRange(selectedDistrict, dateRange, selectedVariable);
 
   const handleDateChange = (updatedRange) => {
     setDateRange(updatedRange); // Update date range
@@ -56,6 +57,7 @@ export default function App() {
                 selectedRegion={selectedRegion}
                 selectedDistrict={selectedDistrict}
                 selectedVariable={selectedVariable}
+                chartData={chartData} // Choose chart data
               />
             </div>
           </div>

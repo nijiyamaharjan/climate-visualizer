@@ -228,7 +228,192 @@ app.post('/api/generate-map', async (req, res) => {
         res.status(500).send({ error: 'Internal Server Error' });
     }
 });
+app.post('/api/generate-map-range', async (req, res) => {
+    const { variable, startDate, endDate, district } = req.body;
 
+    if (!startDate || !endDate || !variable) {
+        return res.status(400).send({ error: 'Start date, end date, and variable are required' });
+    }
+
+    try {
+        // Helper function to generate a map for a specific date
+        const generateMapForDate = async (date) => {
+            console.log("Generating map for date:", date); // Debugging line
+
+            const baseQuery = `
+                SELECT d.district, ST_AsGeoJSON(d.geom) AS geometry, t.value
+                FROM district_boundaries d
+                JOIN ${variable} t ON d.district = t.district_name
+                WHERE t.timestamp = $1
+            `;
+            value = [date]
+            const result = await pool.query(baseQuery, value);
+
+            if (!result.rows.length) {
+                throw new Error("No data found for this date.");
+            }
+
+            const geojson = {
+                type: 'FeatureCollection',
+                features: result.rows.map(row => ({
+                    type: 'Feature',
+                    geometry: JSON.parse(row.geometry),
+                    properties: {
+                        district: row.district,
+                        [variable]: row.value,
+                    },
+                })),
+            };
+  
+            // Launch browser with specific settings
+            const browser = await puppeteer.launch({
+                headless: 'new',
+                args: ['--no-sandbox', '--disable-setuid-sandbox']
+            });
+            const page = await browser.newPage();
+
+            // Set a larger viewport
+            await page.setViewport({
+                width: 1200,
+                height: 800,
+                deviceScaleFactor: 2  // For better resolution
+            });
+
+            // Create the HTML content (same as before)
+            const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Map Export</title>
+                    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+                    <style>
+                        body, html { margin: 0; padding: 0; height: 100vh; width: 100vw; }
+                        #map { width: 100%; height: 100%; }
+                    </style>
+                </head>
+                <body>
+                    <div id="map"></div>
+                    <script>
+                        const geojsonData = ${JSON.stringify(geojson)};
+
+                        function initMap() {
+                            return new Promise((resolve) => {
+                                const map = L.map('map', {
+                                    zoomControl: false,
+                                    attributionControl: false
+                                }).setView([28.3949, 84.1240], 7);
+
+                                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png', {
+                                    maxZoom: 12,
+                                    minZoom: 7
+                                }).addTo(map);
+
+                                const style = (feature) => {
+                                    const value = feature.properties['${variable}'];
+                                    let fillColor;
+                                    if ('${variable}' === 'tas_min') {
+                                        const tempCelsius = value - 273.15;
+                                        fillColor = tempCelsius > 40 ? '#800026' :
+                                                  tempCelsius > 30 ? '#BD0026' :
+                                                  tempCelsius > 20 ? '#E31A1C' :
+                                                  tempCelsius > 10 ? '#FC4E2A' :
+                                                  tempCelsius > 0  ? '#FD8D3C' :
+                                                  tempCelsius > -10 ? '#6BAED6' :
+                                                  '#08519C';
+                                    } else {
+                                        fillColor = value > 3.9 ? '#3E1A8E' :  
+                                            value > 3.8 ? '#5A2A9B' :  
+                                            value > 3.7 ? '#7F4AB8' :  
+                                            value > 3.6 ? '#9B6DCD' :  
+                                            value > 3.5 ? '#B79FDC' :  
+                                            value > 3.4 ? '#D4C1E8' :  
+                                            value > 3.3 ? '#E8D7F4' :  
+                                            value > 3.2 ? '#F1E5FB' :  
+                                            value > 3.1 ? '#D0D9F5' :  
+                                            value > 3 ? '#A3B9F2' :  
+                                            value > 2.9 ? '#7DA9EE' :  
+                                            value > 2.8 ? '#539FE5' :  
+                                            value > 2.7 ? '#1F8FD5' :  
+                                            '#0F72B0';  
+                                    }
+
+                                    return {
+                                        fillColor: fillColor,
+                                        weight: 2,
+                                        opacity: 1,
+                                        color: 'white',
+                                        dashArray: '3',
+                                        fillOpacity: 0.7
+                                    };
+                                };
+
+                                const layer = L.geoJSON(geojsonData, { style }).addTo(map);
+
+                                // Wait for tiles to load
+                                map.whenReady(() => {
+                                    // Additional delay to ensure everything is rendered
+                                    setTimeout(() => {
+                                        window.mapLoadComplete = true;
+                                        resolve();
+                                    }, 2000);
+                                });
+                            });
+                        }
+
+                        // Initialize map and signal when complete
+                        initMap().then(() => {
+                            window.mapLoadComplete = true;
+                        });
+                    </script>
+                </body>
+            </html>
+        `;
+
+            await page.setContent(htmlContent);
+            await page.waitForSelector('#map');
+            await page.waitForFunction(() => window.mapLoadComplete === true, { timeout: 15000 });
+
+            // Take screenshot
+            const screenshot = await page.screenshot({
+                type: 'png',
+                fullPage: true,
+                omitBackground: false
+            });
+            await browser.close();
+            return screenshot;
+        };
+
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const imageUrls = [];
+        for (let date = new Date(start); date <= end; date.setMonth(date.getMonth() + 1)) {
+            // Set the day to the 1st of the month (in case it's not already the 1st)
+            date.setDate(1);
+            console.log(date)
+            const dateStr = date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+            console.log("Generating map for:", dateStr); // Debugging line
+            const screenshot = await generateMapForDate(dateStr);
+        
+            // Save the image file (you can store it locally or in a cloud storage service)
+            const imageFilePath = `maps/map_${dateStr}.png`;
+            await fs.promises.writeFile(imageFilePath, screenshot);
+            // Add the image file path or URL to the response
+            imageUrls.push(`/${imageFilePath}`);
+        }
+
+        // Send a response with all generated map URLs
+        res.status(200).json({
+            message: 'Maps generated successfully',
+            maps: imageUrls
+        });
+
+    } catch (error) {
+        console.error('Error generating maps:', error);
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
+});
 // Add a debug endpoint to see the HTML content
 app.get('/api/debug-map-html', async (req, res) => {
     const { variable, date, district } = req.query;
@@ -394,6 +579,7 @@ app.get('/api/data', async (req, res) => {
         res.status(500).send({ error: 'Internal Server Error' });
     }
 });
+
 
 // New route for fetching tas_min data for a range of dates
 app.get('/api/data-range', async (req, res) => {

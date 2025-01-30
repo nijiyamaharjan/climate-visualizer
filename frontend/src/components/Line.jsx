@@ -2,6 +2,7 @@ import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useDataRange } from '../hooks/useDataRange';
 import dayjs from 'dayjs';
+import useDownloadImage from '../hooks/useDownloadImage'; // Import the custom hook
 
 // Function to calculate the linear regression trend line
 const calculateTrendLine = (data) => {
@@ -27,6 +28,7 @@ const calculateTrendLine = (data) => {
 
 export default function LineChartComponent({ selectedRegion, selectedDistrict, dateRange, selectedVariable }) {
     const { chartData, loading, error } = useDataRange(selectedDistrict, dateRange, selectedVariable);
+    const { downloadImage } = useDownloadImage(); // Use the custom hook
 
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
@@ -76,10 +78,11 @@ export default function LineChartComponent({ selectedRegion, selectedDistrict, d
                 </div>
             ) : chartData.length === 0 ? (
                 <div className="flex justify-center items-center h-64">
-                    <p className="text-gray-600">No data available for the selected region and date range.</p>
+                    <p className="text-gray-600">Select region and date range.</p>
                 </div>
             ) : (
-                <ResponsiveContainer width="100%" height={300}>
+                <div>
+                <ResponsiveContainer width="100%" height={300} id="line">
                     <LineChart 
                         data={chartData} 
                         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
@@ -128,7 +131,15 @@ export default function LineChartComponent({ selectedRegion, selectedDistrict, d
                         />
                     </LineChart>
                 </ResponsiveContainer>
+                <button
+                onClick={() => downloadImage('line', 'line-chart.png')}
+                className="mt-4 p-2 bg-blue-500 text-white rounded"
+              >
+                Download Chart as PNG
+              </button>
+              </div>
             )}
+            
         </div>
     );
 }
