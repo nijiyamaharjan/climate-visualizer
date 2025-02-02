@@ -2,6 +2,7 @@ import { MapContainer, TileLayer, GeoJSON, LayersControl } from 'react-leaflet';
 import React, { useState, useEffect, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
 import MapDownloader from './MapDownloader';
+import GifDownloader from './GifDownloader'
 
 export default function Map() {
     const [districts, setDistricts] = useState(null);
@@ -185,7 +186,7 @@ export default function Map() {
                     <div className="loader">Loading...</div>
                 </div>
             )}
-
+            <GifDownloader variable={selectedVariable}/>
             <MapDownloader 
             variable={selectedVariable}
             date={selectedDate}
