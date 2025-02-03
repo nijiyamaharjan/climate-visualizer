@@ -84,7 +84,22 @@ export default function Map() {
            value > 2.8 ? '#539FE5' :  
            value > 2.7 ? '#1F8FD5' :  
            '#0F72B0';  
+        } else if (selectedVariable === "precipitation") {
+            return value > 50 ? '#0A0F44' :  // Deep Indigo (highest)
+                   value > 40 ? '#162A5B' :  // Dark Navy
+                   value > 30 ? '#203E73' :  // Dark Blue
+                   value > 20 ? '#2B5A91' :  // Deep Blue
+                   value > 10 ? '#3A77AD' :  // Medium Blue
+                   value > 5  ? '#518ECC' :  // Sky Blue
+                   value > 3  ? '#6CA3DF' :  // Soft Blue
+                   value > 2  ? '#87B6E9' :  // Muted Blue
+                   value > 1  ? '#A3C8F1' :  // Light Blue
+                   value > 0.5 ? '#B7D5F6' : // Softer Blue
+                   value > 0.1 ? '#C7E0FA' : // Pale Blue
+                   '#D8EBFD';               // Very Light Blue (lowest)
         }
+        
+        
         return '#cccccc'; 
     };
 
@@ -146,8 +161,9 @@ export default function Map() {
                     onChange={handleVariableChange}
                     className="border rounded-md px-2 py-1"
                 >
-                    <option value="tas_min">Min Temperature (tas_min)</option>
-                    <option value="sfc_windspeed"> Surface Wind Speed (sfc_windspeed)</option>
+                    <option value="tas_min">Min Temperature (tas_min) K</option>
+                    <option value="sfc_windspeed"> Surface Wind Speed (sfc_windspeed) m/s</option>
+                    <option value="precipitation"> Precipitation Rate (pr) g/m^2/s</option>
                 </select>
             </div>
 
