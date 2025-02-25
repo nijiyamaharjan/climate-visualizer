@@ -6,11 +6,17 @@ import LineChartComponent from "./components/charts/Line";
 import BarChartComponent from "./components/charts/Bar";
 import HeatmapComponent from "./components/charts/Heatmap";
 import { useDataRange } from "./hooks/useDataRange";
+import CompareDropdown from "./components/charts/compare/CompareDropdown";
+import CompareLocations from "./components/charts/compare/CompareLocations";
+import CompareVariables from "./components/charts/compare/CompareVariables";
 
 export default function App() {
     const [selectedRegion, setSelectedRegion] = useState(null);
     const [selectedDistrict, setSelectedDistrict] = useState(null);
     const [selectedVariable, setSelectedVariable] = useState("tas_min");
+
+    const [multipleDistricts, setMultipleDistricts] = useState([])
+    const [multipleVariables, setMultipleVariables] = useState([])
     const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
     const { chartData, loading, error } = useDataRange(
         selectedDistrict,
@@ -71,6 +77,13 @@ export default function App() {
                         </div>
                     </div>
                 </div>
+                <CompareDropdown onDistrictChange={setMultipleDistricts}
+                            onDateChange={handleDateChange}
+                            onVariableChange={setMultipleVariables} />
+                <CompareLocations multipleDistricts={multipleDistricts} // Array of districts
+    dateRange={dateRange}
+    selectedVariable={selectedVariable}/>
+                <CompareVariables multipleDistricts={multipleDistricts} multipleVariables={multipleVariables} dateRange={dateRange}/>
             </div>
         </div>
     );

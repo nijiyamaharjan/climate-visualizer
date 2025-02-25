@@ -166,7 +166,6 @@ function Legend({ variable, date }) {
             }
         };
 
-        // Format date
         const formatDate = (dateString) => {
             const date = new Date(dateString);
             return date.toLocaleDateString("en-US", {
@@ -176,7 +175,6 @@ function Legend({ variable, date }) {
             });
         };
 
-        // Create a legend control
         const legend = L.control({ position: "topleft" });
 
         legend.onAdd = function () {
@@ -221,7 +219,6 @@ function Legend({ variable, date }) {
 
         legend.addTo(map);
 
-        // Clean up when component unmounts
         return () => {
             legend.remove();
         };

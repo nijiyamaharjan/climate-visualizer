@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 import MapDownloader from "../downloader/MapDownloader";
 import GifDownloader from "../downloader/GifDownloader";
 import { getColor } from "../utils/colorCodes";
-import Legend from "./Legend"; 
+import Legend from "./Legend"; // Import the new Legend component
 
 export default function Map() {
     const [districts, setDistricts] = useState(null);
@@ -12,9 +12,10 @@ export default function Map() {
     const [selectedVariable, setSelectedVariable] = useState("tas_min");
     const [month, setMonth] = useState("06"); // Default to June
     const [year, setYear] = useState("2025"); // Default to 2025
-    const [loading, setLoading] = useState(true); 
+    const [loading, setLoading] = useState(true); // Track loading state
     const geoJsonLayerRef = useRef(null);
     const mapRef = useRef(null);
+    const popupRef = useRef(null); // Reference for custom popup
 
     useEffect(() => {
         fetchData(selectedDate, selectedVariable);
@@ -29,7 +30,7 @@ export default function Map() {
 
     const fetchData = async (date, variable) => {
         try {
-            setLoading(true);
+            setLoading(true); // Start loading
             const response = await fetch(
                 `http://localhost:5000/api/data?variable=${variable}&date=${date}`
             );
@@ -40,20 +41,20 @@ export default function Map() {
         } catch (error) {
             console.error(`Error fetching ${variable} data:`, error);
         } finally {
-            setLoading(false); 
+            setLoading(false); // Stop loading once data is fetched
         }
     };
 
     const handleMonthChange = (e) => {
         const newMonth = e.target.value;
         setMonth(newMonth);
-        setSelectedDate(`${year}-${newMonth}-01`); 
+        setSelectedDate(`${year}-${newMonth}-01`); // Update date immediately
     };
 
     const handleYearChange = (e) => {
         const newYear = e.target.value;
         setYear(newYear);
-        setSelectedDate(`${newYear}-${month}-01`); 
+        setSelectedDate(`${newYear}-${month}-01`); // Update date immediately
     };
 
     const handleVariableChange = (e) => {
@@ -64,14 +65,20 @@ export default function Map() {
         layer.on({
             mouseover: (e) => {
                 const popupContent = `District: ${feature.properties.district}<br>${selectedVariable}: ${feature.properties[selectedVariable]}`;
+                updatePopupContent(popupContent);
                 highlightFeature(e.target);
-                layer.bindPopup(popupContent).openPopup();
             },
             mouseout: (e) => {
                 resetHighlight(e.target);
-                layer.closePopup();
+                updatePopupContent(""); // Clear popup content when mouse leaves
             },
         });
+    };
+
+    const updatePopupContent = (content) => {
+        if (popupRef.current) {
+            popupRef.current.innerHTML = content;
+        }
     };
 
     const months = [
@@ -208,8 +215,18 @@ export default function Map() {
                             )}
                         </LayersControl.Overlay>
                     </LayersControl>
+                    {/* Add the Legend component here */}
                     <Legend variable={selectedVariable} date={selectedDate} />
                 </MapContainer>
+            </div>
+
+            {/* Custom Popup positioned at the top-right */}
+            <div
+                ref={popupRef}
+                className="absolute top-4 right-4 bg-white p-2 border rounded shadow-lg z-10"
+                style={{ maxWidth: "200px", wordBreak: "break-word" }}
+            >
+                {/* Content will be updated on hover */}
             </div>
 
             {loading && (

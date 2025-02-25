@@ -1,4 +1,3 @@
-// hooks/useDataRange.js
 import { useState, useEffect } from 'react';
 
 export const useDataRange = (selectedDistrict, dateRange, selectedVariable) => {
@@ -8,21 +7,18 @@ export const useDataRange = (selectedDistrict, dateRange, selectedVariable) => {
 
     useEffect(() => {
         const fetchData = async () => {
-            // Only fetch if we have all required parameters
             if (!selectedDistrict || !dateRange.startDate || !dateRange.endDate || !selectedVariable) {
                 return;
               }
               
-              // Forward the start date and end date by one month
               const newStartDate = new Date(dateRange.startDate);
               newStartDate.setMonth(newStartDate.getMonth() + 1);
               const newEndDate = new Date(dateRange.endDate);
               newEndDate.setMonth(newEndDate.getMonth() + 1);
               
-              // Update the date range with the new dates
               const updatedDateRange = {
-                startDate: newStartDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
-                endDate: newEndDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
+                startDate: newStartDate.toISOString().split('T')[0], 
+                endDate: newEndDate.toISOString().split('T')[0],
               };
 
             setLoading(true);

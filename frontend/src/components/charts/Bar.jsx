@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import { useDataRange } from "../../hooks/useDataRange";
 import dayjs from "dayjs";
-import useDownloadImage from "../../hooks/useDownloadImage"; // Import the custom hook
+import useDownloadImage from "../../hooks/useDownloadImage";
 
 const BarChartComponent = ({
     selectedRegion,
@@ -24,8 +24,7 @@ const BarChartComponent = ({
         dateRange,
         selectedVariable
     );
-    const { downloadImage } = useDownloadImage(); // Use the custom hook
-
+    const { downloadImage } = useDownloadImage();
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
@@ -40,7 +39,6 @@ const BarChartComponent = ({
         return null;
     };
 
-    // Calculate Y-axis domain based on data
     const calculateYAxisDomain = () => {
         if (chartData.length === 0) return [0, 1];
 
@@ -65,7 +63,6 @@ const BarChartComponent = ({
 
     return (
         <div className="bg-white p-4 rounded-lg mb-4 flex flex-col h-[400px]">
-            {/* Loading or no data message */}
             {loading ? (
                 <div className="flex justify-center items-center h-64">
                     <p className="text-gray-600">Loading data...</p>
@@ -77,7 +74,6 @@ const BarChartComponent = ({
                     </p>
                 </div>
             ) : (
-                // Render chart when data is available
                 <div className="flex-grow">
                     <ResponsiveContainer width="100%" height={300} id="bar">
                         <BarChart width={800} height={300} data={chartData}>
@@ -105,7 +101,6 @@ const BarChartComponent = ({
                                 cursor={false}
                             />
                             <Legend formatter={() => selectedVariable} />{" "}
-                            {/* Modify Legend to display selectedVariable */}
                             <Bar
                                 dataKey="value"
                                 fill="#FF6384"

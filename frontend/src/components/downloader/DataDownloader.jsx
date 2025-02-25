@@ -3,7 +3,6 @@ import { BiDownload } from 'react-icons/bi';
 
 export default function DataDownloader({ selectedRegion, selectedDistrict, selectedVariable, chartData }) {
     const downloadCSV = () => {
-        // Check if there's data to download
         if (!chartData || chartData.length === 0) {
             alert('No data available to download.');
             return;
@@ -11,7 +10,7 @@ export default function DataDownloader({ selectedRegion, selectedDistrict, selec
 
         // Format the chart data for CSV
         const csvContent = [
-            'Date,Value', // Assuming each data point has a date and a value
+            'Date,Value', 
             ...chartData.map(row => `${row.date},${row.value}`)
         ].join('\n');
 

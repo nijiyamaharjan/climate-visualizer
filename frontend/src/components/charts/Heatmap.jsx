@@ -4,14 +4,12 @@ import { useDataRange } from "../../hooks/useDataRange";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import { getColor } from "../utils/colorCodes";
 
-// Function to generate the color scale legend based on variable type
 const generateColorLegend = (selectedVariable, minValue, maxValue) => {
     let colorStops = [];
     let labels = [];
     
     // Create appropriate color stops and labels based on the variable
     if (selectedVariable === "tas_min" || selectedVariable === "tas_max") {
-        // Temperature variables
         colorStops = [
             "#FF0000", "#FF3300", "#FF6600", "#FF9900", 
             "#FFCC00", "#FFFF00", "#FFFF66", "#99CCFF", 
@@ -24,35 +22,30 @@ const generateColorLegend = (selectedVariable, minValue, maxValue) => {
             Math.round(minValue) + "K"
         ];
     } else if (selectedVariable === "ndvi") {
-        // NDVI
         colorStops = [
             "#006400", "#228B22", "#32CD32", "#66CDAA", 
             "#98FB98", "#90EE90", "#B0E57C", "#C1F0A5", "#F0FFF0"
         ];
         labels = ["0.8", "0.4", "0.0"];
     } else if (selectedVariable === "precipitation_rate") {
-        // Precipitation
         colorStops = [
             "#0A0F44", "#203E73", "#3A77AD", "#6CA3DF", 
             "#A3C8F1", "#C7E0FA", "#E9F4FF", "#7EC2FF", "#006BB3"
         ];
         labels = [maxValue.toFixed(1), (maxValue/2).toFixed(1), "0"];
     } else if (selectedVariable === "spei") {
-        // SPEI (drought index)
         colorStops = [
             "#00441B", "#1B7837", "#5AAE61", "#A6D96A", "#D9F0A3",
             "#FFFFBF", "#FED976", "#FD8D3C", "#E31A1C", "#800026"
         ];
         labels = ["Extreme Wet", "Neutral", "Extreme Drought"];
     } else if (selectedVariable === "ozone") {
-        // Ozone
         colorStops = [
             "#3F007D", "#7800B3", "#9C179E", "#D85799", 
             "#F792B2", "#FDC9D8", "#FEE9EF", "#FFF5FA"
         ];
         labels = [maxValue.toFixed(1) + " DU", ((maxValue + minValue)/2).toFixed(1) + " DU", minValue.toFixed(1) + " DU"];
     } else {
-        // Default color scale for other variables
         colorStops = [
             "#3E1A8E", "#7F4AB8", "#B79FDC", "#E8D7F4", 
             "#D0D9F5", "#7DA9EE", "#1F8FD5", "#0F72B0"
@@ -69,7 +62,6 @@ const HeatmapComponent = ({
   dateRange,
   selectedVariable,
 }) => {
-  // Use your existing data hook
   const { chartData, loading, error } = useDataRange(
     selectedDistrict,
     dateRange,
@@ -77,7 +69,6 @@ const HeatmapComponent = ({
   );
   const { downloadImage } = useDownloadImage();
 
-  // Process chart data for the heatmap
   const { 
     monthlyData, 
     yearColumns, 
@@ -88,14 +79,13 @@ const HeatmapComponent = ({
       return { monthlyData: [], yearColumns: [], minValue: 0, maxValue: 0 };
     }
 
-    // Group data by month and year
     const groupedData = {};
     const allYears = new Set();
 
     chartData.forEach(item => {
       const date = dayjs(item.date);
-      const month = date.format("MMM"); // Jan, Feb, etc.
-      const year = date.year(); // 2000, 2001, etc.
+      const month = date.format("MMM"); 
+      const year = date.year(); 
 
       if (!groupedData[month]) {
         groupedData[month] = {};
@@ -105,10 +95,8 @@ const HeatmapComponent = ({
       allYears.add(year);
     });
 
-    // Sort years for consistent display
     const yearColumns = Array.from(allYears).sort((a, b) => a - b);
 
-    // Calculate min and max for color scaling
     let minValue = Infinity;
     let maxValue = -Infinity;
 
@@ -121,22 +109,19 @@ const HeatmapComponent = ({
       });
     });
 
-    // Convert to array format with ordered months
     const monthOrder = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const monthlyData = monthOrder
-      .filter(month => groupedData[month]) // Only include months with data
+      .filter(month => groupedData[month]) 
       .map(month => ({ month, ...groupedData[month] }));
 
     return { monthlyData, yearColumns, minValue, maxValue };
   }, [chartData]);
 
-  // Get color Legend for the current variable
   const { colorStops, labels } = useMemo(() => 
     generateColorLegend(selectedVariable, minValue, maxValue), 
     [selectedVariable, minValue, maxValue]
   );
 
-  // Get variable friendly name for display
   const getVariableName = (variable) => {
     const names = {
       'tas_min': 'Minimum Temperature',
@@ -180,7 +165,6 @@ const HeatmapComponent = ({
 
   return (
     <div className="bg-white p-4 rounded-lg mb-4 flex flex-col h-full w-full" id="heatmap">
-      {/* Loading or no data message */}
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <p className="text-gray-600">Loading data...</p>
@@ -190,7 +174,6 @@ const HeatmapComponent = ({
           <p className="text-gray-600">Select region and date range.</p>
         </div>
       ) : (
-        // Render heatmap when data is available
         <div className="flex-grow overflow-auto justify-center items-center">
           <h3 className="text-lg font-semibold mb-2">
             {getVariableName(selectedVariable)} Heatmap
@@ -201,15 +184,13 @@ const HeatmapComponent = ({
           <div className="flex flex-col md:flex-row">
             <div className="flex mb-4 md:mb-0">
               <div className="w-16 font-medium">
-                {/* Month labels */}
-                <div className="h-8"></div> {/* Empty cell for header */}
+                <div className="h-8"></div> 
                 {monthlyData.map((row, index) => (
                   <div key={index} className="h-8 flex items-center">{row.month}</div>
                 ))}
               </div>
               
               <div className="flex-grow">
-                {/* Column headers (years) */}
                 <div className="flex h-8">
                   {yearColumns.map((year, index) => (
                     <div key={index} className="w-12 flex items-center justify-center text-xs">
@@ -218,7 +199,6 @@ const HeatmapComponent = ({
                   ))}
                 </div>
                 
-                {/* Data cells */}
                 {monthlyData.map((row, rowIndex) => (
                   <div key={rowIndex} className="flex h-8">
                     {yearColumns.map((year, colIndex) => {

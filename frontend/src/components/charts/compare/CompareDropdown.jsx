@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
-const DataSelector = ({ onDistrictChange, onDateChange, onVariableChange }) => {
+
+const CompareDropdown = ({ onDistrictChange, onDateChange, onVariableChange }) => {
   const [districts, setDistricts] = useState([]);
+  const [selectedDistricts, setSelectedDistricts] = useState([]);
   const [dateSelections, setDateSelections] = useState({
     startMonth: '',
     startYear: '',
     endMonth: '',
     endYear: ''
-  });  
-  const [variable, setVariable] = useState('tas_min'); 
+  });
+  const [selectedVariables, setSelectedVariables] = useState(['tas_min']);
   const variables = [
     { value: 'tas_min', label: 'Min. Temperature' },
     { value: 'tas_max', label: 'Max. Temperature' },
@@ -27,14 +29,13 @@ const DataSelector = ({ onDistrictChange, onDateChange, onVariableChange }) => {
     const updatedSelections = { ...dateSelections, [name]: value };
     setDateSelections(updatedSelections);
 
-    // Only update the parent when both month and year are selected
     if (name.startsWith('start')) {
       if (updatedSelections.startMonth && updatedSelections.startYear) {
         const startDate = `${updatedSelections.startYear}-${updatedSelections.startMonth}-01`;
-        onDateChange({ 
+        onDateChange({
           startDate,
-          endDate: dateSelections.endMonth && dateSelections.endYear ? 
-            `${dateSelections.endYear}-${dateSelections.endMonth}-01` : 
+          endDate: dateSelections.endMonth && dateSelections.endYear ?
+            `${dateSelections.endYear}-${dateSelections.endMonth}-01` :
             ''
         });
       }
@@ -42,9 +43,8 @@ const DataSelector = ({ onDistrictChange, onDateChange, onVariableChange }) => {
       if (updatedSelections.endMonth && updatedSelections.endYear) {
         const endDate = `${updatedSelections.endYear}-${updatedSelections.endMonth}-01`;
         onDateChange({
-          startDate: dateSelections.startMonth && dateSelections.startYear ? 
-            `${dateSelections.startYear}-${dateSelections.startMonth}-01` : 
-            '',
+          startDate: dateSelections.startMonth && dateSelections.startYear ?
+            `${dateSelections.startYear}-${dateSelections.startMonth}-01` : '',
           endDate
         });
       }
@@ -52,9 +52,15 @@ const DataSelector = ({ onDistrictChange, onDateChange, onVariableChange }) => {
   };
 
   const handleVariableChange = (e) => {
-    const selectedVariable = e.target.value;
-    setVariable(selectedVariable); 
-    onVariableChange(selectedVariable); 
+    const selectedVariables = Array.from(e.target.selectedOptions, option => option.value);
+    setSelectedVariables(selectedVariables);
+    onVariableChange(selectedVariables);
+  };
+
+  const handleDistrictChange = (e) => {
+    const selectedDistricts = Array.from(e.target.selectedOptions, option => option.value);
+    setSelectedDistricts(selectedDistricts);
+    onDistrictChange(selectedDistricts);
   };
 
   useEffect(() => {
@@ -62,7 +68,7 @@ const DataSelector = ({ onDistrictChange, onDateChange, onVariableChange }) => {
       try {
         const response = await fetch('http://localhost:5000/api/districts');
         const data = await response.json();
-        setDistricts(data); 
+        setDistricts(data);
       } catch (error) {
         console.error('Error fetching districts:', error);
       }
@@ -72,21 +78,21 @@ const DataSelector = ({ onDistrictChange, onDateChange, onVariableChange }) => {
 
   const months = Array.from({ length: 12 }, (_, i) => ({
     label: new Date(0, i).toLocaleString('en', { month: 'long' }),
-    value: (i + 1).toString().padStart(2, '0'),
+    value: (i + 1).toString().padStart(2, '0')
   }));
 
-  // Helper function to generate year options (from 1950 to 2100)
   const years = Array.from({ length: 151 }, (_, i) => (1950 + i).toString());
 
   return (
     <div className="flex justify-center items-center space-x-6">
       <div>
-        <h2 className="text-xl font-bold text-center mb-2">Variable</h2>
+        <h2 className="text-xl font-bold text-center mb-2">Variables</h2>
         <div className="relative">
           <select
+            multiple
             className="text-md appearance-none w-48 px-4 py-3 border-2 border-gray-300 rounded-lg"
-            value={variable} 
-            onChange={handleVariableChange} 
+            value={selectedVariables}
+            onChange={handleVariableChange}
           >
             {variables.map((variable) => (
               <option key={variable.value} value={variable.value}>
@@ -167,13 +173,15 @@ const DataSelector = ({ onDistrictChange, onDateChange, onVariableChange }) => {
       </div>
 
       <div>
-        <h2 className="text-xl font-bold text-center mb-2">District</h2>
+        <h2 className="text-xl font-bold text-center mb-2">Districts</h2>
         <div className="relative">
           <select
+            multiple
             className="text-md appearance-none w-48 px-4 py-3 border-2 border-gray-300 rounded-lg"
-            onChange={(e) => onDistrictChange(e.target.value)}
+            value={selectedDistricts}
+            onChange={handleDistrictChange}
           >
-            <option value="">Select a district</option>
+            <option value="">Select districts</option>
             {districts.map((district) => (
               <option key={district} value={district}>
                 {district}
@@ -189,4 +197,4 @@ const DataSelector = ({ onDistrictChange, onDateChange, onVariableChange }) => {
   );
 };
 
-export default DataSelector;
+export default CompareDropdown;

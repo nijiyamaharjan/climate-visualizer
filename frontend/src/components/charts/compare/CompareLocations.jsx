@@ -1,4 +1,5 @@
-import React from "react";
+import { useDataRange } from "../../../hooks/useDataRange";
+import useDownloadImage from "../../..//hooks/useDownloadImage"; 
 import {
     LineChart,
     Line,
@@ -9,44 +10,20 @@ import {
     Legend,
     ResponsiveContainer,
 } from "recharts";
-import { useDataRange } from "../../hooks/useDataRange";
 import dayjs from "dayjs";
-import useDownloadImage from "../../hooks/useDownloadImage"; 
 
-// Function to calculate the linear regression trend line
-const calculateTrendLine = (data) => {
-    const n = data.length;
-    const xValues = data.map((_, index) => index);
-    const yValues = data.map((item) => item.value);
-
-    const sumX = xValues.reduce((acc, val) => acc + val, 0);
-    const sumY = yValues.reduce((acc, val) => acc + val, 0);
-    const sumXY = xValues.reduce(
-        (acc, val, idx) => acc + val * yValues[idx],
-        0
-    );
-    const sumX2 = xValues.reduce((acc, val) => acc + val * val, 0);
-
-    const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-    const intercept = (sumY - slope * sumX) / n;
-
-    return xValues.map((x) => {
-        return { date: data[x].date, value: slope * x + intercept };
-    });
-};
-
-export default function LineChartComponent({
-    selectedRegion,
-    selectedDistrict,
+export default function CompareLocations({
+    selectedRegions, // Array of regions
+    multipleDistricts, // Array of districts
     dateRange,
-    selectedVariable,
+    selectedVariable, // Single variable for comparison
 }) {
     const { chartData, loading, error } = useDataRange(
-        selectedDistrict,
+        multipleDistricts, // Fetch data for multiple districts
         dateRange,
         selectedVariable
     );
-    const { downloadImage } = useDownloadImage(); 
+    const { downloadImage } = useDownloadImage();
 
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
@@ -55,9 +32,11 @@ export default function LineChartComponent({
                     <p className="text-sm font-medium">{`Date: ${dayjs(
                         label
                     ).format("MMM YYYY")}`}</p>
-                    <p className="text-sm text-red-500">
-                        {`${selectedVariable}: ${payload[0].value}`}
-                    </p>
+                    {payload.map((entry, index) => (
+                        <p key={index} className="text-sm text-red-500">
+                            {`${entry.name}: ${entry.value}`}
+                        </p>
+                    ))}
                 </div>
             );
         }
@@ -86,9 +65,6 @@ export default function LineChartComponent({
         );
     }
 
-    // Calculate the trend line based on the chart data
-    const trendLineData = calculateTrendLine(chartData);
-
     return (
         <div className="bg-white p-4 rounded-lg mb-4 h-[400px]">
             {loading ? (
@@ -103,7 +79,7 @@ export default function LineChartComponent({
                 </div>
             ) : (
                 <div>
-                    <ResponsiveContainer width="100%" height={300} id="line">
+                    <ResponsiveContainer width="100%" height={300}>
                         <LineChart
                             data={chartData}
                             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
@@ -117,7 +93,7 @@ export default function LineChartComponent({
                                 tick={{ fontSize: 12 }}
                                 tickFormatter={(tick) =>
                                     dayjs(tick).format("MMM YYYY")
-                                } 
+                                }
                             />
                             <YAxis
                                 domain={calculateYAxisDomain()}
@@ -132,27 +108,18 @@ export default function LineChartComponent({
                             />
                             <Tooltip content={<CustomTooltip />} />
                             <Legend />
-                            <Line
-                                type="monotone"
-                                dataKey="value"
-                                name={selectedVariable}
-                                stroke="#FF6384"
-                                dot={false}
-                                activeDot={{ r: 6 }}
-                                isAnimationActive={false}
-                            />
-                            {/* Add the dotted trend line with lighter green color */}
-                            <Line
-                                type="linear"
-                                dataKey="value"
-                                name="trend"
-                                data={trendLineData} 
-                                stroke="#90EE90" 
-                                dot={false}
-                                strokeWidth={2}
-                                isAnimationActive={false}
-                                strokeDasharray="5 5"
-                            />
+                            {multipleDistricts.map((district) => (
+                                <Line
+                                    key={district}
+                                    type="monotone"
+                                    dataKey={district}
+                                    name={district}
+                                    stroke="#FF6384"
+                                    dot={false}
+                                    activeDot={{ r: 6 }}
+                                    isAnimationActive={false}
+                                />
+                            ))}
                         </LineChart>
                     </ResponsiveContainer>
                     <button

@@ -1,4 +1,3 @@
-// hooks/useDownloadImage.js
 import { useCallback } from 'react';
 import domtoimage from 'dom-to-image';
 
