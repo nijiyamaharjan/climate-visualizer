@@ -10,7 +10,7 @@ const DataSelector = ({ onDistrictChange, onDateChange, onVariableChange }) => {
     endYear: ''
   });  
   const [variable, setVariable] = useState('tas_min'); // Initial variable
-  const variables = ['tas_min', 'Rainfall', 'Humidity', 'sfc_windspeed'];
+  const variables = ['tas_min', 'tas_max', 'sfc_windspeed', 'pr', 'snowfall', 'snowmelt', 'spei', 'ozone', 'ndvi'];
 
   const handleDateChange = (e) => {
     const { name, value } = e.target;

@@ -46,7 +46,7 @@ const BarChartComponent = ({ selectedRegion, selectedDistrict, dateRange, select
   }
 
   return (
-    <div className="bg-white p-4 rounded-lg mb-4">
+    <div className="bg-white p-4 rounded-lg mb-4 flex flex-col h-[400px]">
       {/* Loading or no data message */}
       {loading ? (
         <div className="flex justify-center items-center h-64">
@@ -58,9 +58,9 @@ const BarChartComponent = ({ selectedRegion, selectedDistrict, dateRange, select
         </div>
       ) : (
         // Render chart when data is available
-        <div>
+        <div className="flex-grow">
           <ResponsiveContainer width="100%" height={300} id="bar">
-            <BarChart width={800} height={600} data={chartData}>
+            <BarChart width={800} height={300} data={chartData}>
               <CartesianGrid stroke="#ccc" />
               <XAxis
                 dataKey="date"
@@ -79,7 +79,7 @@ const BarChartComponent = ({ selectedRegion, selectedDistrict, dateRange, select
                 allowDataOverflow={true}
               />
               <Tooltip content={<CustomTooltip />} cursor={false} />
-              <Legend />
+              <Legend formatter={() => selectedVariable} /> {/* Modify Legend to display selectedVariable */}
               <Bar
                 dataKey="value"
                 fill="#FF6384"
@@ -88,8 +88,7 @@ const BarChartComponent = ({ selectedRegion, selectedDistrict, dateRange, select
               />
             </BarChart>
           </ResponsiveContainer>
-
-          {/* Button to download chart as PNG */}
+  
           <button
             onClick={() => downloadImage('bar', 'bar-chart.png')}
             className="mt-4 p-2 bg-blue-500 text-white rounded"
@@ -100,6 +99,7 @@ const BarChartComponent = ({ selectedRegion, selectedDistrict, dateRange, select
       )}
     </div>
   );
+  
 };
 
 export default BarChartComponent;

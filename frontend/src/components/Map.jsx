@@ -3,14 +3,15 @@ import React, { useState, useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 import MapDownloader from "./MapDownloader";
 import GifDownloader from "./GifDownloader";
-import { getColor } from './colorCodes'; // Import the color logic
+import { getColor } from './colorCodes';
+import Legend from './Legend'; // Import the new Legend component
 
 export default function Map() {
     const [districts, setDistricts] = useState(null);
     const [selectedDate, setSelectedDate] = useState("2025-06-01");
     const [selectedVariable, setSelectedVariable] = useState("tas_min");
     const [month, setMonth] = useState("06"); // Default to June
-    const [year, setYear] = useState("2025"); // Default to 2025    const [selectedVariable, setSelectedVariable] = useState('tas_min');
+    const [year, setYear] = useState("2025"); // Default to 2025
     const [loading, setLoading] = useState(true); // Track loading state
     const geoJsonLayerRef = useRef(null);
     const mapRef = useRef(null);
@@ -73,7 +74,6 @@ export default function Map() {
         });
     };
 
-
     const months = [
         { value: "01", label: "January" },
         { value: "02", label: "February" },
@@ -88,8 +88,6 @@ export default function Map() {
         { value: "11", label: "November" },
         { value: "12", label: "December" },
     ];
-
-
 
     const style = (feature) => {
         const value = feature.properties[selectedVariable];
@@ -131,7 +129,6 @@ export default function Map() {
         <div className="relative">
             <div className="p-4 bg-white shadow-md rounded-lg mb-4 flex justify-start gap-10 items-center">
                 <label>
-
                     <select value={month} onChange={handleMonthChange}>
                         {months.map(({ value, label }) => (
                             <option key={value} value={value}>
@@ -217,6 +214,8 @@ export default function Map() {
                             )}
                         </LayersControl.Overlay>
                     </LayersControl>
+                    {/* Add the Legend component here */}
+                    <Legend variable={selectedVariable} date={selectedDate} />
                 </MapContainer>
             </div>
 

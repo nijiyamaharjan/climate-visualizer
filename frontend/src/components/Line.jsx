@@ -71,7 +71,7 @@ export default function LineChartComponent({ selectedRegion, selectedDistrict, d
     const trendLineData = calculateTrendLine(chartData);
 
     return (
-        <div className="bg-white p-4 rounded-lg mb-4">
+        <div className="bg-white p-4 rounded-lg mb-4 h-[400px]">
             {loading ? (
                 <div className="flex justify-center items-center h-64">
                     <p className="text-gray-600">Loading data...</p>
@@ -122,6 +122,7 @@ export default function LineChartComponent({ selectedRegion, selectedDistrict, d
                         <Line 
                             type="linear" 
                             dataKey="value"
+                            name="trend"
                             data={trendLineData}  // Trend line data
                             stroke="#90EE90"  // Lighter green color
                             dot={false} 
@@ -129,6 +130,7 @@ export default function LineChartComponent({ selectedRegion, selectedDistrict, d
                             isAnimationActive={false}
                             strokeDasharray="5 5" // Dotted line
                         />
+                        
                     </LineChart>
                 </ResponsiveContainer>
                 <button
