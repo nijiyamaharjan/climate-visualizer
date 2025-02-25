@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import Map from "./components/Map";
-import DataDownloader from "./components/DataDownloader";
-import DataSelector from "./components/Dropdown";
-import LineChartComponent from "./components/Line";
-import BarChartComponent from "./components/Bar";
+import Map from "./components/map/Map";
+import DataDownloader from "./components/downloader/DataDownloader";
+import DataSelector from "./components/charts/Dropdown";
+import LineChartComponent from "./components/charts/Line";
+import BarChartComponent from "./components/charts/Bar";
+import HeatmapComponent from "./components/charts/Heatmap";
 import { useDataRange } from "./hooks/useDataRange";
 
 export default function App() {
@@ -36,11 +37,7 @@ export default function App() {
                         />
                     </div>
                     <div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        {/* Data Downloader */}
-
-                        {/* Line Chart Component */}
-
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <LineChartComponent
                                 selectedRegion={selectedRegion}
                                 selectedDistrict={selectedDistrict}
@@ -48,25 +45,31 @@ export default function App() {
                                 dateRange={dateRange}
                             />
 
-                        {/* Bar Chart Component */}
                             <BarChartComponent
                                 selectedRegion={selectedRegion}
                                 selectedDistrict={selectedDistrict}
                                 selectedVariable={selectedVariable}
                                 dateRange={dateRange}
                             />
-                        
-                    </div>
-                    <div className="col-span-2">
+                            
+                        </div>
+                        <div className="col-span-2">
+                            <div className="grid grid-cols-1">
+                            <HeatmapComponent
+                                selectedRegion={selectedRegion}
+                                selectedDistrict={selectedDistrict}
+                                selectedVariable={selectedVariable}
+                                dateRange={dateRange}
+                            />
+                            </div>
                             <DataDownloader
                                 selectedRegion={selectedRegion}
                                 selectedDistrict={selectedDistrict}
                                 selectedVariable={selectedVariable}
-                                chartData={chartData} // Choose chart data
+                                chartData={chartData}
                             />
                         </div>
                     </div>
-                    
                 </div>
             </div>
         </div>

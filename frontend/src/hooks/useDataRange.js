@@ -11,14 +11,26 @@ export const useDataRange = (selectedDistrict, dateRange, selectedVariable) => {
             // Only fetch if we have all required parameters
             if (!selectedDistrict || !dateRange.startDate || !dateRange.endDate || !selectedVariable) {
                 return;
-            }
+              }
+              
+              // Forward the start date and end date by one month
+              const newStartDate = new Date(dateRange.startDate);
+              newStartDate.setMonth(newStartDate.getMonth() + 1);
+              const newEndDate = new Date(dateRange.endDate);
+              newEndDate.setMonth(newEndDate.getMonth() + 1);
+              
+              // Update the date range with the new dates
+              const updatedDateRange = {
+                startDate: newStartDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
+                endDate: newEndDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
+              };
 
             setLoading(true);
             setError(null);
 
             try {
                 const response = await fetch(
-                    `http://localhost:5000/api/data-range?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}&district=${selectedDistrict}&variable=${selectedVariable}`
+                    `http://localhost:5000/api/data-range?startDate=${updatedDateRange.startDate}&endDate=${updatedDateRange.endDate}&district=${selectedDistrict}&variable=${selectedVariable}`
                 );
                 
                 if (!response.ok) {

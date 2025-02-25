@@ -1,10 +1,10 @@
 import { MapContainer, TileLayer, GeoJSON, LayersControl } from "react-leaflet";
 import React, { useState, useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
-import MapDownloader from "./MapDownloader";
-import GifDownloader from "./GifDownloader";
-import { getColor } from './colorCodes';
-import Legend from './Legend'; // Import the new Legend component
+import MapDownloader from "../downloader/MapDownloader";
+import GifDownloader from "../downloader/GifDownloader";
+import { getColor } from "../utils/colorCodes";
+import Legend from "./Legend"; // Import the new Legend component
 
 export default function Map() {
     const [districts, setDistricts] = useState(null);
@@ -33,9 +33,9 @@ export default function Map() {
             const response = await fetch(
                 `http://localhost:5000/api/data?variable=${variable}&date=${date}`
             );
-            console.log('variable ', variable)
+            console.log("variable ", variable);
             const data = await response.json();
-            console.log('data ', data)
+            console.log("data ", data);
             setDistricts(data);
         } catch (error) {
             console.error(`Error fetching ${variable} data:`, error);
@@ -43,7 +43,7 @@ export default function Map() {
             setLoading(false); // Stop loading once data is fetched
         }
     };
-    
+
     const handleMonthChange = (e) => {
         const newMonth = e.target.value;
         setMonth(newMonth);
@@ -176,15 +176,9 @@ export default function Map() {
                     <option value="snowmelt">
                         Snowmelt (m of water equivalent)
                     </option>
-                    <option value="spei">
-                        SPEI
-                    </option>
-                    <option value="ozone">
-                        Ozone (Dobson unit)
-                    </option>
-                    <option value="ndvi">
-                        NDVI
-                    </option>
+                    <option value="spei">SPEI</option>
+                    <option value="ozone">Ozone (Dobson unit)</option>
+                    <option value="ndvi">NDVI</option>
                 </select>
             </div>
 
@@ -214,12 +208,10 @@ export default function Map() {
                             )}
                         </LayersControl.Overlay>
                     </LayersControl>
-                    {/* Add the Legend component here */}
                     <Legend variable={selectedVariable} date={selectedDate} />
                 </MapContainer>
             </div>
 
-            {/* Show loading indicator until data is ready */}
             {loading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50">
                     <div className="loader">Loading...</div>
