@@ -1,10 +1,12 @@
 import { useState } from "react";
 
-export default function GenerateMapRange({variable}) {
+export default function GenerateMapRange({ variable }) {
   const [formData, setFormData] = useState({
     variable: variable,
-    startDate: "",
-    endDate: "",
+    startMonth: "06",
+    startYear: "2025",
+    endMonth: "06",
+    endYear: "2025",
     district: "KTM"
   });
   const [error, setError] = useState(null);
@@ -19,34 +21,34 @@ export default function GenerateMapRange({variable}) {
     setError(null);
     setIsLoading(true);
 
+    const startDate = `${formData.startYear}-${formData.startMonth}-01`;
+    const endDate = `${formData.endYear}-${formData.endMonth}-01`;
+
     try {
       const res = await fetch("http://localhost:5000/api/generate-map-range", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({ ...formData, startDate, endDate })
       });
 
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
 
-      // Verify we're getting a GIF
       const contentType = res.headers.get("content-type");
       if (!contentType || !contentType.includes("image/gif")) {
         throw new Error("Response is not a GIF!");
       }
 
       const blob = await res.blob();
-      
-      // Create and click a download link
+
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.download = `map_${formData.variable}_${formData.startDate}_${formData.endDate}.gif`;
+      link.download = `map_${formData.variable}_${startDate}_${endDate}.gif`;
       document.body.appendChild(link);
       link.click();
-      
-      // Clean up
+
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (err) {
@@ -56,26 +58,61 @@ export default function GenerateMapRange({variable}) {
     }
   };
 
+  const months = [
+    { value: "01", label: "January" },
+    { value: "02", label: "February" },
+    { value: "03", label: "March" },
+    { value: "04", label: "April" },
+    { value: "05", label: "May" },
+    { value: "06", label: "June" },
+    { value: "07", label: "July" },
+    { value: "08", label: "August" },
+    { value: "09", label: "September" },
+    { value: "10", label: "October" },
+    { value: "11", label: "November" },
+    { value: "12", label: "December" }
+  ];
+
+  const years = Array.from({ length: 50 }, (_, i) => (2025 + i).toString());
+
   return (
     <div className="p-4 max-w-md mx-auto bg-white shadow-md rounded-lg">
       <h2 className="text-xl font-semibold mb-4">Generate Map Range</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="date"
-          name="startDate"
-          value={formData.startDate}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          type="date"
-          name="endDate"
-          value={formData.endDate}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-          required
-        />
+        <div className="flex gap-2">
+          <select name="startMonth" value={formData.startMonth} onChange={handleChange} className="w-1/2 p-2 border rounded">
+            {months.map((m) => (
+              <option key={m.value} value={m.value}>
+                {m.label}
+              </option>
+            ))}
+          </select>
+          <select name="startYear" value={formData.startYear} onChange={handleChange} className="w-1/2 p-2 border rounded">
+            {years.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex gap-2">
+          <select name="endMonth" value={formData.endMonth} onChange={handleChange} className="w-1/2 p-2 border rounded">
+            {months.map((m) => (
+              <option key={m.value} value={m.value}>
+                {m.label}
+              </option>
+            ))}
+          </select>
+          <select name="endYear" value={formData.endYear} onChange={handleChange} className="w-1/2 p-2 border rounded">
+            {years.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <button
           type="submit"
           className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 disabled:bg-blue-300"
