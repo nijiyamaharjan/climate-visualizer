@@ -2,7 +2,7 @@ import { useState } from "react";
 
 export default function GenerateMapRange({ variable }) {
   const [formData, setFormData] = useState({
-    variable: variable,
+    variable,
     startMonth: "06",
     startYear: "2025",
     endMonth: "06",
@@ -23,7 +23,6 @@ export default function GenerateMapRange({ variable }) {
 
     const startDate = `${formData.startYear}-${formData.startMonth}-01`;
     const endDate = `${formData.endYear}-${formData.endMonth}-01`;
-
     try {
       const res = await fetch("http://localhost:5000/api/generate-map-range", {
         method: "POST",

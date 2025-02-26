@@ -1,5 +1,6 @@
-import { useDataRange } from "../../../hooks/useDataRange";
-import useDownloadImage from "../../../hooks/useDownloadImage"; 
+import { useDataRangeMultipleVariables } from "../../../hooks/useDataRangeMultipleVariables";
+import useDownloadImage from "../../..//hooks/useDownloadImage"; 
+
 import {
     LineChart,
     Line,
@@ -12,16 +13,29 @@ import {
 } from "recharts";
 import dayjs from "dayjs";
 
+const VARIABLE_COLORS = [
+    "#FF6384", // Red
+    "#36A2EB", // Blue
+    "#FFCE56", // Yellow
+    "#4BC0C0", // Teal
+    "#9966FF", // Purple
+    "#FF9F40", // Orange
+    "#C9CBCF", // Gray
+    "#77DD77", // Green
+    "#FDFD96", // Light Yellow
+    "#FF6961", // Light Red
+];
+
 export default function CompareVariables({
     selectedRegions, // Array of regions
-    multipleDistricts, // Array of districts
+    selectedDistrict, // Array of districts
     dateRange,
     multipleVariables, // Array of selected variables
 }) {
-    const { chartData, loading, error } = useDataRange(
-        multipleDistricts,
+    const { chartData, loading, error } = useDataRangeMultipleVariables(
+        selectedDistrict,
         dateRange,
-        multipleVariables[0] // Assumes the first variable is used for fetching data
+        multipleVariables // Assumes the first variable is used for fetching data
     );
     const { downloadImage } = useDownloadImage();
 
@@ -110,13 +124,13 @@ export default function CompareVariables({
                             />
                             <Tooltip content={<CustomTooltip />} />
                             <Legend />
-                            {multipleVariables.map((variable) => (
+                            {multipleVariables.map((variable, index) => (
                                 <Line
                                     key={variable}
                                     type="monotone"
                                     dataKey={variable}
                                     name={variable} // Name used in the legend
-                                    stroke="#FF6384"
+                                    stroke={VARIABLE_COLORS[index % VARIABLE_COLORS.length]}
                                     dot={false}
                                     activeDot={{ r: 6 }}
                                     isAnimationActive={false}

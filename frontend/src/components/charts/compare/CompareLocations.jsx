@@ -1,4 +1,4 @@
-import { useDataRange } from "../../../hooks/useDataRange";
+import { useDataRangeMultipleDistricts } from "../../../hooks/useDataRangeMultipleDistricts";
 import useDownloadImage from "../../..//hooks/useDownloadImage"; 
 import {
     LineChart,
@@ -12,19 +12,32 @@ import {
 } from "recharts";
 import dayjs from "dayjs";
 
+const DISTRICT_COLORS = [
+    "#FF6384", // Red
+    "#36A2EB", // Blue
+    "#FFCE56", // Yellow
+    "#4BC0C0", // Teal
+    "#9966FF", // Purple
+    "#FF9F40", // Orange
+    "#C9CBCF", // Gray
+    "#77DD77", // Green
+    "#FDFD96", // Light Yellow
+    "#FF6961", // Light Red
+];
+
 export default function CompareLocations({
     selectedRegions, // Array of regions
     multipleDistricts, // Array of districts
     dateRange,
     selectedVariable, // Single variable for comparison
 }) {
-    const { chartData, loading, error } = useDataRange(
+
+    const { chartData, loading, error } = useDataRangeMultipleDistricts(
         multipleDistricts, // Fetch data for multiple districts
         dateRange,
         selectedVariable
     );
     const { downloadImage } = useDownloadImage();
-
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
@@ -108,13 +121,13 @@ export default function CompareLocations({
                             />
                             <Tooltip content={<CustomTooltip />} />
                             <Legend />
-                            {multipleDistricts.map((district) => (
+                            {multipleDistricts.map((district, index) => (
                                 <Line
                                     key={district}
                                     type="monotone"
                                     dataKey={district}
                                     name={district}
-                                    stroke="#FF6384"
+                                    stroke={DISTRICT_COLORS[index % DISTRICT_COLORS.length]}
                                     dot={false}
                                     activeDot={{ r: 6 }}
                                     isAnimationActive={false}

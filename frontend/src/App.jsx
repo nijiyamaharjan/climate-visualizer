@@ -7,6 +7,8 @@ import BarChartComponent from "./components/charts/Bar";
 import HeatmapComponent from "./components/charts/Heatmap";
 import { useDataRange } from "./hooks/useDataRange";
 import CompareDropdown from "./components/charts/compare/CompareDropdown";
+import CompareLocationsDropdown from "./components/charts/compare/CompareLocationsDropdown";
+import CompareVariablesDropdown from "./components/charts/compare/CompareVariablesDropdown";
 import CompareLocations from "./components/charts/compare/CompareLocations";
 import CompareVariables from "./components/charts/compare/CompareVariables";
 
@@ -15,8 +17,8 @@ export default function App() {
     const [selectedDistrict, setSelectedDistrict] = useState(null);
     const [selectedVariable, setSelectedVariable] = useState("tas_min");
 
-    const [multipleDistricts, setMultipleDistricts] = useState([])
-    const [multipleVariables, setMultipleVariables] = useState([])
+    const [multipleDistricts, setMultipleDistricts] = useState([]);
+    const [multipleVariables, setMultipleVariables] = useState([]);
     const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
     const { chartData, loading, error } = useDataRange(
         selectedDistrict,
@@ -26,6 +28,14 @@ export default function App() {
 
     const handleDateChange = (updatedRange) => {
         setDateRange(updatedRange); // Update date range
+    };
+
+    const handleDistrictChange = (selectedDistricts) => {
+        setMultipleDistricts(selectedDistricts); // Ensures full list is stored
+    };
+
+    const handleVariableChange = (selectedVariables) => {
+        setMultipleVariables(selectedVariables); // Ensures full list is stored
     };
 
     return (
@@ -57,16 +67,15 @@ export default function App() {
                                 selectedVariable={selectedVariable}
                                 dateRange={dateRange}
                             />
-                            
                         </div>
                         <div className="col-span-2">
                             <div className="grid grid-cols-1">
-                            <HeatmapComponent
-                                selectedRegion={selectedRegion}
-                                selectedDistrict={selectedDistrict}
-                                selectedVariable={selectedVariable}
-                                dateRange={dateRange}
-                            />
+                                <HeatmapComponent
+                                    selectedRegion={selectedRegion}
+                                    selectedDistrict={selectedDistrict}
+                                    selectedVariable={selectedVariable}
+                                    dateRange={dateRange}
+                                />
                             </div>
                             <DataDownloader
                                 selectedRegion={selectedRegion}
@@ -77,13 +86,26 @@ export default function App() {
                         </div>
                     </div>
                 </div>
-                <CompareDropdown onDistrictChange={setMultipleDistricts}
-                            onDateChange={handleDateChange}
-                            onVariableChange={setMultipleVariables} />
-                <CompareLocations multipleDistricts={multipleDistricts} // Array of districts
-    dateRange={dateRange}
-    selectedVariable={selectedVariable}/>
-                <CompareVariables multipleDistricts={multipleDistricts} multipleVariables={multipleVariables} dateRange={dateRange}/>
+                <CompareLocationsDropdown
+                    onDistrictChange={handleDistrictChange}
+                    onDateChange={handleDateChange}
+                    onVariableChange={setSelectedVariable}
+                />
+                <CompareLocations
+                    multipleDistricts={multipleDistricts}
+                    dateRange={dateRange}
+                    selectedVariable={selectedVariable}
+                />
+                <CompareVariablesDropdown
+                    onDistrictChange={setSelectedDistrict}
+                    onDateChange={handleDateChange}
+                    onVariableChange={handleVariableChange}
+                />
+                <CompareVariables
+                    selectedDistrict={selectedDistrict}
+                    dateRange={dateRange}
+                    multipleVariables={multipleVariables}
+                />
             </div>
         </div>
     );
