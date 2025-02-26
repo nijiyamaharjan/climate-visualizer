@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Select from "react-select";
 import { ChevronDown } from "lucide-react";
 
 const CompareVariablesDropdown = ({
@@ -57,17 +58,14 @@ const CompareVariablesDropdown = ({
         }
     };
 
-    const handleVariableChange = (e) => {
-        const selectedVariables = Array.from(
-            e.target.selectedOptions,
-            (option) => option.value
-        );
+    const handleVariableChange = (selectedOptions) => {
+        const selectedVariables = selectedOptions.map(option => option.value);
         setSelectedVariables(selectedVariables);
         onVariableChange(selectedVariables);
     };
 
-    const handleDistrictChange = (e) => {
-        const selectedDistrict = e.target.value
+    const handleDistrictChange = (selectedOption) => {
+        const selectedDistrict = selectedOption.value;
         setSelectedDistrict(selectedDistrict);
         onDistrictChange(selectedDistrict);
     };
@@ -97,19 +95,19 @@ const CompareVariablesDropdown = ({
     return (
         <div className="flex flex-col space-y-4">
             <div>
-            <h2 className="text-lg font-bold">Select Variables</h2>
-                <select
-                    multiple
-                    className="border rounded-md px-3 py-2 w-full h-40"
-                    value={selectedVariables}
+                <h2 className="text-lg font-bold">Select Variables</h2>
+                <Select
+                    isMulti
+                    value={selectedVariables.map((value) => ({
+                        value,
+                        label: variables.find((variable) => variable.value === value)?.label,
+                    }))}
                     onChange={handleVariableChange}
-                >
-                    {variables.map((variable) => (
-                        <option key={variable.value} value={variable.value}>
-                            {variable.label}
-                        </option>
-                    ))}
-                </select>
+                    options={variables}
+                    className="w-full"
+                    classNamePrefix="react-select"
+                    closeMenuOnSelect={false}
+                />
             </div>
 
             <div>
@@ -174,17 +172,16 @@ const CompareVariablesDropdown = ({
 
             <div>
                 <h2 className="text-lg font-bold">Select District</h2>
-                <select
-                    className="border rounded-md px-3 py-2 w-full"
-                    value={selectedDistrict}
+                <Select
+                    value={{ value: selectedDistrict, label: selectedDistrict }}
                     onChange={handleDistrictChange}
-                >
-                    {districts.map((district) => (
-                        <option key={district} value={district}>
-                            {district}
-                        </option>
-                    ))}
-                </select>
+                    options={districts.map((district) => ({
+                        value: district,
+                        label: district,
+                    }))}
+                    className="w-full"
+                    classNamePrefix="react-select"
+                />
             </div>
         </div>
     );

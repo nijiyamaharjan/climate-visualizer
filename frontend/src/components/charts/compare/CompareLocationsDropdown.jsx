@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
+import Select from "react-select"; // Import react-select
 
 const CompareLocationsDropdown = ({
     onDistrictChange,
@@ -50,11 +51,8 @@ const CompareLocationsDropdown = ({
         onVariableChange(selectedValue);
     };
 
-    const handleDistrictChange = (e) => {
-        const selectedValues = Array.from(
-            e.target.selectedOptions,
-            (option) => option.value
-        );
+    const handleDistrictChange = (selectedOptions) => {
+        const selectedValues = selectedOptions.map(option => option.value); // Get selected district values
         setSelectedDistricts(selectedValues); // Update local state
         onDistrictChange(selectedValues); // Pass selected districts up to parent
     };
@@ -164,18 +162,24 @@ const CompareLocationsDropdown = ({
 
             <div>
                 <h2 className="text-lg font-bold">Select Districts</h2>
-                <select
-                    multiple
-                    className="border rounded-md px-3 py-2 w-full h-40"
-                    value={selectedDistricts}
+                <Select
+                    isMulti
+                    options={districts.map((district) => ({
+                        value: district,
+                        label: district,
+                    }))}
+                    value={selectedDistricts.map((district) => ({
+                        value: district,
+                        label: district,
+                    }))}
                     onChange={handleDistrictChange}
-                >
-                    {districts.map((district) => (
-                        <option key={district} value={district}>
-                            {district}
-                        </option>
-                    ))}
-                </select>
+                    className="w-full"
+                    placeholder="Select Districts"
+                    closeMenuOnSelect={false} // Keeps the dropdown open after selecting
+                    components={{
+                        DropdownIndicator: () => <ChevronDown size={20} />, // Optional custom dropdown indicator
+                    }}
+                />
             </div>
         </div>
     );
