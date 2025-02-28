@@ -55,7 +55,7 @@ export default function Chatbot() {
     }, 15000); 
 
     try {
-      API call
+      // API call
       const response = await fetch("http://api-endpoint/query", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
