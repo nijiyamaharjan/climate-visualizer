@@ -11,6 +11,7 @@ import CompareLocationsDropdown from "./components/charts/compare/CompareLocatio
 import CompareVariablesDropdown from "./components/charts/compare/CompareVariablesDropdown";
 import CompareLocations from "./components/charts/compare/CompareLocations";
 import CompareVariables from "./components/charts/compare/CompareVariables";
+import Chatbot from "./components/chatbot/Chatbot";
 
 export default function App() {
     const [selectedRegion, setSelectedRegion] = useState(null);
@@ -174,6 +175,7 @@ export default function App() {
                         </div>
                     )}
                 </div>
+                <Chatbot />
             </div>
         </div>
     );

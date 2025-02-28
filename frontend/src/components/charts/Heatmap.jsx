@@ -211,7 +211,7 @@ const HeatmapComponent = ({
                             backgroundColor: value !== undefined ? getColor(value, selectedVariable) : '#f0f0f0',
                             color: value !== undefined ? 
                               (selectedVariable === 'tas_min' || selectedVariable === 'tas_max' || selectedVariable === 'ndvi') ? 
-                                (value > 290 ? '#000' : '#fff') : '#fff' : '#888'
+                                (value > 290 ? '#000' : '#000') : '#fff' : '#888'
                           }}
                           title={`${row.month} ${year}: ${value !== undefined ? value.toFixed(3) + ' ' + getVariableUnits(selectedVariable) : 'No data'}`}
                         >
