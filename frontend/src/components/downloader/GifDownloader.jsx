@@ -4,9 +4,9 @@ export default function GenerateMapRange({ variable }) {
   const [formData, setFormData] = useState({
     variable,
     startMonth: "01",
-    startYear: "2010",
+    startYear: "2025",
     endMonth: "06",
-    endYear: "2010",
+    endYear: "2025",
     district: "KTM"
   });
   const [error, setError] = useState(null);

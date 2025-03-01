@@ -145,7 +145,7 @@ app.post("/api/generate-map", async (req, res) => {
                                 const style = (feature) => {
                                     const value = feature.properties['${variable}'];
                                     let fillColor;
-                                    if ('${variable}' === 'tas_min || ${variable}' === 'tas_max' || ${variable}' === 'tas) {
+                                    if ('${variable}' === 'tas_min' || '${variable}' === 'tas_max' || '${variable}' === 'tas') {
                                       fillColor = value > 310 ? '#FF0000' :
                                                 value > 305 ? '#FF3300' :
                                                 value > 300 ? '#FF6600' :
@@ -455,7 +455,7 @@ app.post("/api/generate-map-range", async (req, res) => {
                                 const style = (feature) => {
                                     const value = feature.properties['${variable}'];
                                     let fillColor;
-                                    if ('${variable}' === 'tas_min || ${variable}' === 'tas_max' || ${variable}' === 'tas) {
+                                    if ('${variable}' === 'tas_min' || '${variable}' === 'tas_max' || '${variable}' === 'tas') {
                                       fillColor = value > 310 ? '#FF0000' :
                                                 value > 305 ? '#FF3300' :
                                                 value > 300 ? '#FF6600' :
@@ -770,7 +770,7 @@ app.get("/api/debug-map-html", async (req, res) => {
                                 console.log('Styling feature:', feature.properties.district, 'value:', value);
                                 
                                 let fillColor;
-                                    if ('${variable}' === 'tas_min || ${variable}' === 'tas_max' || ${variable}' === 'tas) {
+                                    if ('${variable}' === 'tas_min' || '${variable}' === 'tas_max' || '${variable}' === 'tas') {
                                       fillColor = value > 310 ? '#FF0000' :
                                                 value > 305 ? '#FF3300' :
                                                 value > 300 ? '#FF6600' :
