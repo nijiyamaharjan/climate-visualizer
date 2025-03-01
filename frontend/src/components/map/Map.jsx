@@ -46,7 +46,7 @@ export default function Map() {
         tas_max: { startYear: 1950, endYear: 2100 },
         tas: { startYear: 1950, endYear: 210 },
         precipitation_rate: { startYear: 1950, endYear: 2100 },
-        total_precipitaion: { startYear: 1950, endYear: 2025 },
+        total_precipitation: { startYear: 1950, endYear: 2025 },
         hurs: { startYear: 1950, endYear: 2100 },
         huss: { startYear: 1950, endYear: 2100 },
         snowfall: { startYear: 1950, endYear: 2023 },

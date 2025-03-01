@@ -10,12 +10,14 @@ const DataSelector = ({ onDistrictChange, onDateChange, onVariableChange }) => {
         endYear: "",
     });
     const [variable, setVariable] = useState("tas_min");
+    const [availableYears, setAvailableYears] = useState([]);
+    
     const variables = [
         { value: "tas_min", label: "Min. Temperature (K)" },
         { value: "tas_max", label: "Max. Temperature (K)" },
         { value: "tas", label: "Average Temperature (K)" },
         { value: "precipitation_rate", label: "Precipitation Rate (g/m^2/s)" },
-        { value: "total_precipitaion", label: "Total Precipitation (m)" },
+        { value: "total_precipitation", label: "Total Precipitation (m)" },
         { value: "hurs", label: "Relative Humidity (%)" },
         { value: "huss", label: "Specific Humidity (Mass fraction)" },
         { value: "snowfall", label: "Snowfall (m of water equivalent)" },
@@ -29,9 +31,9 @@ const DataSelector = ({ onDistrictChange, onDateChange, onVariableChange }) => {
     const variableDateRanges = {
         tas_min: { startYear: 1950, endYear: 2100 },
         tas_max: { startYear: 1950, endYear: 2100 },
-        tas: { startYear: 1950, endYear: 210 },
+        tas: { startYear: 1950, endYear: 2100 },
         precipitation_rate: { startYear: 1950, endYear: 2100 },
-        total_precipitaion: { startYear: 1950, endYear: 2025 },
+        total_precipitation: { startYear: 1950, endYear: 2025 },
         hurs: { startYear: 1950, endYear: 2100 },
         huss: { startYear: 1950, endYear: 2100 },
         snowfall: { startYear: 1950, endYear: 2023 },
@@ -41,6 +43,14 @@ const DataSelector = ({ onDistrictChange, onDateChange, onVariableChange }) => {
         ndvi: { startYear: 1981, endYear: 2013 },
         sfc_windspeed: { startYear: 1950, endYear: 2100 },
     };
+    useEffect(() => {
+        const { startYear, endYear } = variableDateRanges[variable] || { startYear: 1950, endYear: 2100 };
+        setAvailableYears(
+            Array.from({ length: endYear - startYear + 1 }, (_, i) =>
+                (startYear + i).toString()
+            )
+        );
+    }, [variable]);
 
     const handleDateChange = (e) => {
         const { name, value } = e.target;
@@ -73,47 +83,42 @@ const DataSelector = ({ onDistrictChange, onDateChange, onVariableChange }) => {
         }
     };
 
-    const handleVariableChange = (selectedOptions) => {
-        const selectedValues = selectedOptions
-            ? selectedOptions.map((opt) => opt.value)
-            : [];
-        setSelectedVariables(selectedValues);
-        onVariableChange(selectedValues);
-
-        // Find the most restrictive date range
-        let minYear = 1950,
-            maxYear = 2100;
-        selectedValues.forEach((variable) => {
-            const { startYear, endYear } = variableDateRanges[variable] || {
-                startYear: 1950,
-                endYear: 2100,
-            };
-            minYear = Math.max(minYear, startYear);
-            maxYear = Math.min(maxYear, endYear);
-        });
-
+    const handleVariableChange = (e) => {
+        const selectedValue = e.target.value;
+        setVariable(selectedValue);
+        onVariableChange([selectedValue]); // Wrap in array since you're expecting an array
+        
+        // Get date range for the selected variable
+        const { startYear, endYear } = variableDateRanges[selectedValue] || {
+            startYear: 1950,
+            endYear: 2100,
+        };
+        
+        // Log the selected year range
+        console.log("Available Year Range:", startYear, endYear);
+        
         // Update available years
         setAvailableYears(
-            Array.from({ length: maxYear - minYear + 1 }, (_, i) =>
-                (minYear + i).toString()
+            Array.from({ length: endYear - startYear + 1 }, (_, i) =>
+                (startYear + i).toString()
             )
         );
-
+        
         // Reset selected dates if they are out of range
         setDateSelections((prev) => ({
             startMonth: prev.startMonth,
             startYear:
-                prev.startYear >= minYear && prev.startYear <= maxYear
+                prev.startYear >= startYear && prev.startYear <= endYear
                     ? prev.startYear
                     : "",
             endMonth: prev.endMonth,
             endYear:
-                prev.endYear >= minYear && prev.endYear <= maxYear
+                prev.endYear >= startYear && prev.endYear <= endYear
                     ? prev.endYear
                     : "",
         }));
     };
-
+    
     useEffect(() => {
         const fetchDistricts = async () => {
             try {
@@ -145,7 +150,7 @@ const DataSelector = ({ onDistrictChange, onDateChange, onVariableChange }) => {
                     <select
                         className="text-md appearance-none w-48 px-4 py-3 border-2 border-gray-300 rounded-lg"
                         value={variable}
-                        onChange={handleVariableChange}
+                        onChange={(e) => handleVariableChange(e)}
                     >
                         {variables.map((variable) => (
                             <option key={variable.value} value={variable.value}>
@@ -188,12 +193,14 @@ const DataSelector = ({ onDistrictChange, onDateChange, onVariableChange }) => {
                             className="border rounded-md px-3 py-2"
                         >
                             <option value="">Year</option>
-                            {availableYears.map((year) => (
-                                <option key={year} value={year}>
-                                    {year}
-                                </option>
-                            ))}
+                            {availableYears.length > 0 &&
+                                availableYears.map((year) => (
+                                    <option key={year} value={year}>
+                                        {year}
+                                    </option>
+                                ))}
                         </select>
+
                     </div>
                 </div>
                 <div>

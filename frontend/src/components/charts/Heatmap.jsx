@@ -253,15 +253,15 @@ const HeatmapComponent = ({
                   <div key={rowIndex} className="flex h-8">
                     {yearColumns.map((year, colIndex) => {
                       const value = row[year];
+                      console.log(selectedVariable)
                       return (
+                        
                         <div 
                           key={colIndex} 
                           className="w-12 h-8 flex items-center justify-center text-xs border border-gray-200"
                           style={{ 
-                            backgroundColor: value !== undefined ? getColor(value, selectedVariable) : '#f0f0f0',
-                            color: value !== undefined ? 
-                              (selectedVariable === 'tas_min' || selectedVariable === 'tas_max' || selectedVariable === 'ndvi') ? 
-                                (value > 290 ? '#000' : '#000') : '#fff' : '#888'
+                            backgroundColor: value !== undefined ? getColor(value, selectedVariable[0]) : '#f0f0f0',
+                            color: "#000"
                           }}
                           title={`${row.month} ${year}: ${value !== undefined ? value.toFixed(3) + ' ' + getVariableUnits(selectedVariable) : 'No data'}`}
                         >
@@ -287,22 +287,7 @@ const HeatmapComponent = ({
             </div>
           </div>
           
-          {/* Custom Legend based on variable type */}
-          {/* <div className="mt-6">
-            <h4 className="text-sm font-medium mb-2">Legend</h4>
-            <div className="flex items-center">
-              <div className="flex h-6 rounded overflow-hidden">
-                {colorStops.map((color, index) => (
-                  <div key={index} className="w-8 h-6" style={{ backgroundColor: color }}></div>
-                ))}
-              </div>
-            </div>
-            <div className="flex justify-between mt-1 text-xs">
-              {labels.map((label, index) => (
-                <span key={index} className={index === 1 ? "mx-auto" : ""}>{label}</span>
-              ))}
-            </div>
-          </div> */}
+         
           
           <button
             onClick={() => downloadImage("heatmap", `${selectedVariable}_heatmap_${selectedRegion || 'all'}.png`)}

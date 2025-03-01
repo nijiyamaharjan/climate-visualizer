@@ -23,7 +23,7 @@ const CompareLocationsDropdown = ({
         { value: "tas_max", label: "Max. Temperature (K)" },
         { value: "tas", label: "Average Temperature (K)" },
         { value: "precipitation_rate", label: "Precipitation Rate (g/m^2/s)" },
-        { value: "total_precipitaion", label: "Total Precipitation (m)" },
+        { value: "total_precipitation", label: "Total Precipitation (m)" },
         { value: "hurs", label: "Relative Humidity (%)" },
         { value: "huss", label: "Specific Humidity (Mass fraction)" },
         { value: "snowfall", label: "Snowfall (m of water equivalent)" },
@@ -39,7 +39,7 @@ const CompareLocationsDropdown = ({
         tas_max: { startYear: 1950, endYear: 2100 },
         tas: { startYear: 1950, endYear: 210 },
         precipitation_rate: { startYear: 1950, endYear: 2100 },
-        total_precipitaion: { startYear: 1950, endYear: 2025 },
+        total_precipitation: { startYear: 1950, endYear: 2025 },
         hurs: { startYear: 1950, endYear: 2100 },
         huss: { startYear: 1950, endYear: 2100 },
         snowfall: { startYear: 1950, endYear: 2023 },
@@ -49,6 +49,15 @@ const CompareLocationsDropdown = ({
         ndvi: { startYear: 1981, endYear: 2013 },
         sfc_windspeed: { startYear: 1950, endYear: 2100 },
     };
+
+    useEffect(() => {
+            const { startYear, endYear } = variableDateRanges[selectedVariable] || { startYear: 1950, endYear: 2100 };
+            setAvailableYears(
+                Array.from({ length: endYear - startYear + 1 }, (_, i) =>
+                    (startYear + i).toString()
+                )
+            );
+        }, [selectedVariable]);
 
     const handleDateChange = (e) => {
         const { name, value } = e.target;
@@ -66,31 +75,47 @@ const CompareLocationsDropdown = ({
         });
     };
 
-    const handleVariableChange = (e) => {
-        const selectedValue = e.target.value;
-        setSelectedVariable(selectedValue);
-        onVariableChange(selectedValue);
-
-        const { startYear, endYear } = variableDateRanges[selectedValue] || {
-            startYear: 1950,
-            endYear: 2100,
-        };
-
-        const newYears = Array.from(
-            { length: endYear - startYear + 1 },
-            (_, i) => (startYear + i).toString()
+    const handleVariableChange = (selectedOptions) => {
+        // Ensure selectedOptions is an array
+        const selectedValues = Array.isArray(selectedOptions)
+            ? selectedOptions.map((opt) => opt.value)
+            : [];
+    
+        setVariable(selectedValues[0]); // Update only the first selected variable
+        onVariableChange(selectedValues);
+    
+        // Find the most restrictive date range
+        let minYear = 1950,
+            maxYear = 2100;
+        selectedValues.forEach((variable) => {
+            const { startYear, endYear } = variableDateRanges[variable] || {
+                startYear: 1950,
+                endYear: 2100,
+            };
+            minYear = Math.max(minYear, startYear);
+            maxYear = Math.min(maxYear, endYear);
+        });
+    
+        // Log the selected year range
+        console.log("Available Year Range:", minYear, maxYear);
+    
+        // Update available years
+        setAvailableYears(
+            Array.from({ length: maxYear - minYear + 1 }, (_, i) =>
+                (minYear + i).toString()
+            )
         );
-        setAvailableYears(newYears);
-
+    
+        // Reset selected dates if they are out of range
         setDateSelections((prev) => ({
             startMonth: prev.startMonth,
             startYear:
-                prev.startYear >= startYear && prev.startYear <= endYear
+                prev.startYear >= minYear && prev.startYear <= maxYear
                     ? prev.startYear
                     : "",
             endMonth: prev.endMonth,
             endYear:
-                prev.endYear >= startYear && prev.endYear <= endYear
+                prev.endYear >= minYear && prev.endYear <= maxYear
                     ? prev.endYear
                     : "",
         }));
