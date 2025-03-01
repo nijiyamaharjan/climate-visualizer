@@ -16,22 +16,39 @@ const CompareLocationsDropdown = ({
         endYear: "",
     });
     const [selectedVariable, setSelectedVariable] = useState("tas_min");
+    const [availableYears, setAvailableYears] = useState([]);
 
     const variables = [
-        { value: 'tas_min', label: 'Min. Temperature (K)' },
-        { value: 'tas_max', label: 'Max. Temperature (K)' },
-        { value: 'tas', label: 'Average Temperature (K)' },
-        { value: 'precipitation_rate', label: 'Precipitation Rate (g/m^2/s)' },
-        { value: 'total_precipitaion', label: 'Total Precipitation (m)' },
-        { value: 'hurs', label: 'Relative Humidity (%)' },
-        { value: 'huss', label: 'Specific Humidity (Mass fraction)' }, 
-        { value: 'snowfall', label: 'Snowfall (m of water equivalent)' },
-        { value: 'snowmelt', label: 'Snowmelt (m of water equivalent)' },
-        { value: 'spei', label: 'SPEI' },
-        { value: 'ozone', label: 'Ozone (Dobson unit)' },
-        { value: 'ndvi', label: 'NDVI' },
-        { value: 'sfc_windspeed', label: 'Surface Wind Speed (m/s)' },
-      ];
+        { value: "tas_min", label: "Min. Temperature (K)" },
+        { value: "tas_max", label: "Max. Temperature (K)" },
+        { value: "tas", label: "Average Temperature (K)" },
+        { value: "precipitation_rate", label: "Precipitation Rate (g/m^2/s)" },
+        { value: "total_precipitaion", label: "Total Precipitation (m)" },
+        { value: "hurs", label: "Relative Humidity (%)" },
+        { value: "huss", label: "Specific Humidity (Mass fraction)" },
+        { value: "snowfall", label: "Snowfall (m of water equivalent)" },
+        { value: "snowmelt", label: "Snowmelt (m of water equivalent)" },
+        { value: "spei", label: "SPEI" },
+        { value: "ozone", label: "Ozone (Dobson unit)" },
+        { value: "ndvi", label: "NDVI" },
+        { value: "sfc_windspeed", label: "Surface Wind Speed (m/s)" },
+    ];
+
+    const variableDateRanges = {
+        tas_min: { startYear: 1950, endYear: 2100 },
+        tas_max: { startYear: 1950, endYear: 2100 },
+        tas: { startYear: 1950, endYear: 210 },
+        precipitation_rate: { startYear: 1950, endYear: 2100 },
+        total_precipitaion: { startYear: 1950, endYear: 2025 },
+        hurs: { startYear: 1950, endYear: 2100 },
+        huss: { startYear: 1950, endYear: 2100 },
+        snowfall: { startYear: 1950, endYear: 2023 },
+        snowmelt: { startYear: 1950, endYear: 2023 },
+        spei: { startYear: 1985, endYear: 2020 },
+        ozone: { startYear: 1978, endYear: 2025 },
+        ndvi: { startYear: 1981, endYear: 2013 },
+        sfc_windspeed: { startYear: 1950, endYear: 2100 },
+    };
 
     const handleDateChange = (e) => {
         const { name, value } = e.target;
@@ -53,10 +70,34 @@ const CompareLocationsDropdown = ({
         const selectedValue = e.target.value;
         setSelectedVariable(selectedValue);
         onVariableChange(selectedValue);
+
+        const { startYear, endYear } = variableDateRanges[selectedValue] || {
+            startYear: 1950,
+            endYear: 2100,
+        };
+
+        const newYears = Array.from(
+            { length: endYear - startYear + 1 },
+            (_, i) => (startYear + i).toString()
+        );
+        setAvailableYears(newYears);
+
+        setDateSelections((prev) => ({
+            startMonth: prev.startMonth,
+            startYear:
+                prev.startYear >= startYear && prev.startYear <= endYear
+                    ? prev.startYear
+                    : "",
+            endMonth: prev.endMonth,
+            endYear:
+                prev.endYear >= startYear && prev.endYear <= endYear
+                    ? prev.endYear
+                    : "",
+        }));
     };
 
     const handleDistrictChange = (selectedOptions) => {
-        const selectedValues = selectedOptions.map(option => option.value); // Get selected district values
+        const selectedValues = selectedOptions.map((option) => option.value); // Get selected district values
         setSelectedDistricts(selectedValues); // Update local state
         onDistrictChange(selectedValues); // Pass selected districts up to parent
     };
@@ -127,7 +168,7 @@ const CompareLocationsDropdown = ({
                         className="border rounded-md px-3 py-2"
                     >
                         <option value="">Year</option>
-                        {years.map((year) => (
+                        {availableYears.map((year) => (
                             <option key={year} value={year}>
                                 {year}
                             </option>
@@ -155,7 +196,7 @@ const CompareLocationsDropdown = ({
                         className="border rounded-md px-3 py-2"
                     >
                         <option value="">Year</option>
-                        {years.map((year) => (
+                        {availableYears.map((year) => (
                             <option key={year} value={year}>
                                 {year}
                             </option>

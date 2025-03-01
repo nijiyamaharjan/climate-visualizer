@@ -11,10 +11,11 @@ export default function Map() {
     const [selectedDate, setSelectedDate] = useState("2025-06-01");
     const [selectedVariable, setSelectedVariable] = useState("tas_min");
     const [month, setMonth] = useState("06"); // Default to June
-    const [year, setYear] = useState("2025"); // Default to 2025
+    const [year, setYear] = useState("2010"); // Default to 2025
     const [loading, setLoading] = useState(true);
     const geoJsonLayerRef = useRef(null);
     const mapRef = useRef(null);
+    const [availableYears, setAvailableYears] = useState([]);
 
     useEffect(() => {
         fetchData(selectedDate, selectedVariable);
@@ -26,6 +27,35 @@ export default function Map() {
             geoJsonLayerRef.current.addData(districts);
         }
     }, [districts, selectedVariable, selectedDate]);
+    useEffect(() => {
+        if (variableDateRanges[selectedVariable]) {
+            const { startYear, endYear } = variableDateRanges[selectedVariable];
+            const years = Array.from({ length: endYear - startYear + 1 }, (_, i) => (startYear + i).toString());
+            setAvailableYears(years);
+    
+            // Ensure the selected year is within the valid range
+            if (!years.includes(year)) {
+                setYear(startYear.toString());
+                setSelectedDate(`${startYear}-${month}-01`);
+            }
+        }
+    }, [selectedVariable]);
+    
+    const variableDateRanges = {
+        tas_min: { startYear: 1950, endYear: 2100 },
+        tas_max: { startYear: 1950, endYear: 2100 },
+        tas: { startYear: 1950, endYear: 210 },
+        precipitation_rate: { startYear: 1950, endYear: 2100 },
+        total_precipitaion: { startYear: 1950, endYear: 2025 },
+        hurs: { startYear: 1950, endYear: 2100 },
+        huss: { startYear: 1950, endYear: 2100 },
+        snowfall: { startYear: 1950, endYear: 2023 },
+        snowmelt: { startYear: 1950, endYear: 2023 },
+        spei: { startYear: 1985, endYear: 2020 },
+        ozone: { startYear: 1978, endYear: 2025 },
+        ndvi: { startYear: 1981, endYear: 2013 },
+        sfc_windspeed: { startYear: 1950, endYear: 2100 },
+    };
 
     const fetchData = async (date, variable) => {
         try {
@@ -57,16 +87,74 @@ export default function Map() {
     };
 
     const handleVariableChange = (e) => {
-        setSelectedVariable(e.target.value);
+        const variable = e.target.value;
+        setSelectedVariable(variable);
+    
+        if (variableDateRanges[variable]) {
+            const { startYear, endYear } = variableDateRanges[variable];
+            setAvailableYears(Array.from({ length: endYear - startYear + 1 }, (_, i) => (startYear + i).toString()));
+    
+            // Adjust selected year if it's out of range
+            if (year < startYear || year > endYear) {
+                setYear(startYear);
+                setSelectedDate(`${startYear}-${month}-01`);
+            }
+        }
     };
+    
 
     const handleFeatureHover = (feature, layer) => {
         layer.on({
             mouseover: (e) => {
-                const popupContent = `District: ${feature.properties.district}<br>${selectedVariable}: ${feature.properties[selectedVariable]}`;
+                const value = feature.properties[selectedVariable];
+                const formattedValue = Number(value).toFixed(4)
+                
+                // Get the unit based on the selected variable
+                let unit = "";
+                switch(selectedVariable) {
+                    case "tas_min":
+                    case "tas_max":
+                    case "tas":
+                        unit = "K";
+                        break;
+                    case "precipitation_rate":
+                        unit = "g/m²/s";
+                        break;
+                    case "total_precipitation":
+                        unit = "mm";
+                        break;
+                    case "hurs":
+                        unit = "%";
+                        break;
+                    case "huss":
+                        unit = "kg/kg";
+                        break;
+                    case "snowfall":
+                    case "snowmelt":
+                        unit = "m water eq.";
+                        break;
+                    case "spei":
+                        unit = "";
+                        break;
+                    case "ozone":
+                        unit = "DU";
+                        break;
+                    case "ndvi":
+                        unit = "";
+                        break;
+                    case "sfc_windspeed":
+                        unit = "m/s";
+                        break;
+                    default:
+                        unit = "";
+                }
+                
+                const popupContent = `${feature.properties.district}<br>${selectedVariable}: ${formattedValue} ${unit}`;
+                
                 highlightFeature(e.target);
                 layer.bindPopup(popupContent).openPopup();
             },
+            
             mouseout: (e) => {
                 resetHighlight(e.target);
                 layer.closePopup();
@@ -140,16 +228,14 @@ export default function Map() {
 
                 <label>
                     <select value={year} onChange={handleYearChange}>
-                        {[...Array(100)].map((_, i) => {
-                            const yearOption = 1950 + i;
-                            return (
-                                <option key={yearOption} value={yearOption}>
-                                    {yearOption}
-                                </option>
-                            );
-                        })}
+                        {availableYears.map((yearOption) => (
+                            <option key={yearOption} value={yearOption}>
+                                {yearOption}
+                            </option>
+                        ))}
                     </select>
                 </label>
+
                 <label
                     htmlFor="variable-select"
                     className="font-medium text-gray-700"
@@ -171,9 +257,7 @@ export default function Map() {
                     <option value="total_precipitation">
                         Total Precipitation (mm)
                     </option>
-                    <option value="hurs">
-                        Relative Humidity (%)
-                    </option>
+                    <option value="hurs">Relative Humidity (%)</option>
                     <option value="huss">
                         Specific Humidity (Mass fraction)
                     </option>

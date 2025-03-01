@@ -3,14 +3,30 @@ import { useState } from "react";
 export default function GenerateMapRange({ variable }) {
   const [formData, setFormData] = useState({
     variable,
-    startMonth: "06",
-    startYear: "2025",
+    startMonth: "01",
+    startYear: "2010",
     endMonth: "06",
-    endYear: "2025",
+    endYear: "2010",
     district: "KTM"
   });
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const variableDateRanges = {
+    tas_min: { startYear: 1950, endYear: 2100 },
+    tas_max: { startYear: 1950, endYear: 2100 },
+    tas: { startYear: 1950, endYear: 210 },
+    precipitation_rate: { startYear: 1950, endYear: 2100 },
+    total_precipitaion: { startYear: 1950, endYear: 2025 },
+    hurs: { startYear: 1950, endYear: 2100 },
+    huss: { startYear: 1950, endYear: 2100 },
+    snowfall: { startYear: 1950, endYear: 2023 },
+    snowmelt: { startYear: 1950, endYear: 2023 },
+    spei: { startYear: 1985, endYear: 2020 },
+    ozone: { startYear: 1978, endYear: 2025 },
+    ndvi: { startYear: 1981, endYear: 2013 },
+    sfc_windspeed: { startYear: 1950, endYear: 2100 },
+};
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

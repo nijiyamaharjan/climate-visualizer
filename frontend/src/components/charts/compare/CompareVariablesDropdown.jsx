@@ -16,21 +16,38 @@ const CompareVariablesDropdown = ({
         endYear: "",
     });
     const [selectedVariables, setSelectedVariables] = useState([]);
+    const [availableYears, setAvailableYears] = useState([]);
+
     const variables = [
-        { value: 'tas_min', label: 'Min. Temperature (K)' },
-        { value: 'tas_max', label: 'Max. Temperature (K)' },
-        { value: 'tas', label: 'Average Temperature (K)' },
-        { value: 'precipitation_rate', label: 'Precipitation Rate (g/m^2/s)' },
-        { value: 'total_precipitaion', label: 'Total Precipitation (m)' },
-        { value: 'hurs', label: 'Relative Humidity (%)' },
-        { value: 'huss', label: 'Specific Humidity (Mass fraction)' }, 
-        { value: 'snowfall', label: 'Snowfall (m of water equivalent)' },
-        { value: 'snowmelt', label: 'Snowmelt (m of water equivalent)' },
-        { value: 'spei', label: 'SPEI' },
-        { value: 'ozone', label: 'Ozone (Dobson unit)' },
-        { value: 'ndvi', label: 'NDVI' },
-        { value: 'sfc_windspeed', label: 'Surface Wind Speed (m/s)' },
-      ];
+        { value: "tas_min", label: "Min. Temperature (K)" },
+        { value: "tas_max", label: "Max. Temperature (K)" },
+        { value: "tas", label: "Average Temperature (K)" },
+        { value: "precipitation_rate", label: "Precipitation Rate (g/m^2/s)" },
+        { value: "total_precipitaion", label: "Total Precipitation (m)" },
+        { value: "hurs", label: "Relative Humidity (%)" },
+        { value: "huss", label: "Specific Humidity (Mass fraction)" },
+        { value: "snowfall", label: "Snowfall (m of water equivalent)" },
+        { value: "snowmelt", label: "Snowmelt (m of water equivalent)" },
+        { value: "spei", label: "SPEI" },
+        { value: "ozone", label: "Ozone (Dobson unit)" },
+        { value: "ndvi", label: "NDVI" },
+        { value: "sfc_windspeed", label: "Surface Wind Speed (m/s)" },
+    ];
+    const variableDateRanges = {
+        tas_min: { startYear: 1950, endYear: 2100 },
+        tas_max: { startYear: 1950, endYear: 2100 },
+        tas: { startYear: 1950, endYear: 210 },
+        precipitation_rate: { startYear: 1950, endYear: 2100 },
+        total_precipitaion: { startYear: 1950, endYear: 2025 },
+        hurs: { startYear: 1950, endYear: 2100 },
+        huss: { startYear: 1950, endYear: 2100 },
+        snowfall: { startYear: 1950, endYear: 2023 },
+        snowmelt: { startYear: 1950, endYear: 2023 },
+        spei: { startYear: 1985, endYear: 2020 },
+        ozone: { startYear: 1978, endYear: 2025 },
+        ndvi: { startYear: 1981, endYear: 2013 },
+        sfc_windspeed: { startYear: 1950, endYear: 2100 },
+    };
 
     const handleDateChange = (e) => {
         const { name, value } = e.target;
@@ -63,10 +80,30 @@ const CompareVariablesDropdown = ({
     };
 
     const handleVariableChange = (selectedOptions) => {
-        const selectedVariables = selectedOptions.map(option => option.value);
-        setSelectedVariables(selectedVariables);
-        onVariableChange(selectedVariables);
+        const selectedValues = selectedOptions ? selectedOptions.map(opt => opt.value) : [];
+        setSelectedVariables(selectedValues);
+        onVariableChange(selectedValues);
+    
+        // Find the most restrictive date range
+        let minYear = 1950, maxYear = 2100;
+        selectedValues.forEach((variable) => {
+            const { startYear, endYear } = variableDateRanges[variable] || { startYear: 1950, endYear: 2100 };
+            minYear = Math.max(minYear, startYear);
+            maxYear = Math.min(maxYear, endYear);
+        });
+    
+        // Update available years
+        setAvailableYears(Array.from({ length: maxYear - minYear + 1 }, (_, i) => (minYear + i).toString()));
+    
+        // Reset selected dates if they are out of range
+        setDateSelections(prev => ({
+            startMonth: prev.startMonth,
+            startYear: prev.startYear >= minYear && prev.startYear <= maxYear ? prev.startYear : "",
+            endMonth: prev.endMonth,
+            endYear: prev.endYear >= minYear && prev.endYear <= maxYear ? prev.endYear : "",
+        }));
     };
+    
 
     const handleDistrictChange = (selectedOption) => {
         const selectedDistrict = selectedOption.value;
@@ -104,7 +141,9 @@ const CompareVariablesDropdown = ({
                     isMulti
                     value={selectedVariables.map((value) => ({
                         value,
-                        label: variables.find((variable) => variable.value === value)?.label,
+                        label: variables.find(
+                            (variable) => variable.value === value
+                        )?.label,
                     }))}
                     onChange={handleVariableChange}
                     options={variables}
@@ -137,7 +176,7 @@ const CompareVariablesDropdown = ({
                         className="border rounded-md px-3 py-2"
                     >
                         <option value="">Year</option>
-                        {years.map((year) => (
+                        {availableYears.map((year) => (
                             <option key={year} value={year}>
                                 {year}
                             </option>
@@ -165,7 +204,7 @@ const CompareVariablesDropdown = ({
                         className="border rounded-md px-3 py-2"
                     >
                         <option value="">Year</option>
-                        {years.map((year) => (
+                        {availableYears.map((year) => (
                             <option key={year} value={year}>
                                 {year}
                             </option>

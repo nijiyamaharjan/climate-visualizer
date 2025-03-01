@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
-
 const CompareDropdown = ({ onDistrictChange, onDateChange, onVariableChange }) => {
   const [districts, setDistricts] = useState([]);
   const [selectedDistricts, setSelectedDistricts] = useState([]);
@@ -12,6 +11,22 @@ const CompareDropdown = ({ onDistrictChange, onDateChange, onVariableChange }) =
     endYear: ''
   });
   const [selectedVariables, setSelectedVariables] = useState(['tas_min']);
+  const [availableDateRanges, setAvailableDateRanges] = useState({
+    tas_min: { startYear: 1950, endYear: 2100 },
+    tas_max: { startYear: 1950, endYear: 2100 },
+    tas: { startYear: 1950, endYear: 210 },
+    precipitation_rate: { startYear: 1950, endYear: 2100 },
+    total_precipitaion: { startYear: 1950, endYear: 2025 },
+    hurs: { startYear: 1950, endYear: 2100 },
+    huss: { startYear: 1950, endYear: 2100 },
+    snowfall: { startYear: 1950, endYear: 2023 },
+    snowmelt: { startYear: 1950, endYear: 2023 },
+    spei: { startYear: 1985, endYear: 2020 },
+    ozone: { startYear: 1978, endYear: 2025 },
+    ndvi: { startYear: 1981, endYear: 2013 },
+    sfc_windspeed: { startYear: 1950, endYear: 2100 }
+  });
+
   const variables = [
     { value: 'tas_min', label: 'Min. Temperature (K)' },
     { value: 'tas_max', label: 'Max. Temperature (K)' },
@@ -19,7 +34,7 @@ const CompareDropdown = ({ onDistrictChange, onDateChange, onVariableChange }) =
     { value: 'precipitation_rate', label: 'Precipitation Rate (g/m^2/s)' },
     { value: 'total_precipitaion', label: 'Total Precipitation (m)' },
     { value: 'hurs', label: 'Relative Humidity (%)' },
-    { value: 'huss', label: 'Specific Humidity (Mass fraction)' }, 
+    { value: 'huss', label: 'Specific Humidity (Mass fraction)' },
     { value: 'snowfall', label: 'Snowfall (m of water equivalent)' },
     { value: 'snowmelt', label: 'Snowmelt (m of water equivalent)' },
     { value: 'spei', label: 'SPEI' },
@@ -38,7 +53,7 @@ const CompareDropdown = ({ onDistrictChange, onDateChange, onVariableChange }) =
         const startDate = `${updatedSelections.startYear}-${updatedSelections.startMonth}-01`;
         onDateChange({
           startDate,
-          endDate: dateSelections.endMonth && dateSelections.endYear ?
+          endDate: dateSelections.endMonth && dateSelections.endYear ? 
             `${dateSelections.endYear}-${dateSelections.endMonth}-01` :
             ''
         });
@@ -47,7 +62,7 @@ const CompareDropdown = ({ onDistrictChange, onDateChange, onVariableChange }) =
       if (updatedSelections.endMonth && updatedSelections.endYear) {
         const endDate = `${updatedSelections.endYear}-${updatedSelections.endMonth}-01`;
         onDateChange({
-          startDate: dateSelections.startMonth && dateSelections.startYear ?
+          startDate: dateSelections.startMonth && dateSelections.startYear ? 
             `${dateSelections.startYear}-${dateSelections.startMonth}-01` : '',
           endDate
         });
@@ -59,6 +74,20 @@ const CompareDropdown = ({ onDistrictChange, onDateChange, onVariableChange }) =
     const selectedVariables = Array.from(e.target.selectedOptions, option => option.value);
     setSelectedVariables(selectedVariables);
     onVariableChange(selectedVariables);
+
+    // Update available date range based on selected variable
+    const newDateRange = selectedVariables.reduce((acc, variable) => {
+      acc.startYear = Math.max(acc.startYear, availableDateRanges[variable].startYear);
+      acc.endYear = Math.min(acc.endYear, availableDateRanges[variable].endYear);
+      return acc;
+    }, { startYear: 1950, endYear: 2020 });
+
+    setDateSelections({
+      startYear: newDateRange.startYear.toString(),
+      endYear: newDateRange.endYear.toString(),
+      startMonth: '01', // default to January
+      endMonth: '12'    // default to December
+    });
   };
 
   const handleDistrictChange = (e) => {
@@ -135,7 +164,7 @@ const CompareDropdown = ({ onDistrictChange, onDateChange, onVariableChange }) =
               className="border rounded-md px-3 py-2 w-24"
             >
               <option value="">Year</option>
-              {years.map((year) => (
+              {years.filter(year => year >= dateSelections.startYear && year <= dateSelections.endYear).map((year) => (
                 <option key={year} value={year}>
                   {year}
                 </option>
@@ -166,7 +195,7 @@ const CompareDropdown = ({ onDistrictChange, onDateChange, onVariableChange }) =
               className="border rounded-md px-3 py-2 w-24"
             >
               <option value="">Year</option>
-              {years.map((year) => (
+              {years.filter(year => year >= dateSelections.startYear && year <= dateSelections.endYear).map((year) => (
                 <option key={year} value={year}>
                   {year}
                 </option>
