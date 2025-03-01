@@ -111,6 +111,33 @@ app.post("/api/generate-map", async (req, res) => {
             deviceScaleFactor: 2, // For better resolution
         });
 
+                // Function to format date
+                function formatDate(date) {
+                    const options = { year: 'numeric', month: 'short' };
+                    const formattedDate = new Date(date).toLocaleDateString('en-US', options);
+                    return formattedDate;
+                }
+
+                // Function to get user-friendly variable name
+                 function getVariableName(variable) {
+                    const variableNames = {
+                        'tas_min': 'Min. Temperature (K)',
+                        'tas_max': 'Max. Temperature (K)',
+                        'tas': 'Avg. Temperature (K)',
+                        'precipitation_rate': 'Precipitation Rate (g/m^2/s)',
+                        'total_precipitation': 'Total Precipitation (m)',
+                        'hurs': 'Relative Humidity (%)',
+                        'huss': 'Specific Humidity (Mass fraction)',
+                        'snowfall': 'Snowfall (m of water equivalent)',
+                        'snowmelt': 'Snowmelt (m of water equivalent)',
+                        'spei': 'SPEI',
+                        'ozone': 'Ozone (Dobson unit)',
+                        'ndvi': 'NDVI',
+                        'sfc_windspeed': 'Surface Wind Speed (m/s)',
+                    };
+                    return variableNames[variable] || variable;
+                }
+
         // Create the HTML content
         const htmlContent = `
             <!DOCTYPE html>
@@ -123,9 +150,22 @@ app.post("/api/generate-map", async (req, res) => {
                     <style>
                         body, html { margin: 0; padding: 0; height: 100vh; width: 100vw; }
                         #map { width: 100%; height: 100%; }
+                         #header { 
+                            background-color: rgba(255, 255, 255, 0.8); 
+                            padding: 10px; 
+                            font-size: 20px; 
+                            text-align: center; 
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            z-index: 999;
+                        }
                     </style>
                 </head>
                 <body>
+                <div id="header">
+                <strong>${getVariableName(variable)}</strong> : <strong>${formatDate(date)}</strong>
+            </div>
                     <div id="map"></div>
                     <script>
                         const geojsonData = ${JSON.stringify(geojson)};
@@ -318,11 +358,12 @@ app.post("/api/generate-map", async (req, res) => {
                         initMap().then(() => {
                             window.mapLoadComplete = true;
                         });
+
+                
                     </script>
                 </body>
             </html>
         `;
-
         await page.setContent(htmlContent);
         await page.waitForSelector("#map");
         // Wait for map to be fully loaded
