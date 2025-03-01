@@ -312,7 +312,7 @@ export default function Map() {
                 </div>
             )}
             <MapDownloader variable={selectedVariable} date={selectedDate} />
-            <GifDownloader variable={selectedVariable} />
+            <GifDownloader/>
         </div>
     );
 }
