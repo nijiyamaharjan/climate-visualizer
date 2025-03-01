@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import { useDataRange } from "../../hooks/useDataRange";
 import dayjs from "dayjs";
-import useDownloadImage from "../../hooks/useDownloadImage"; 
+import useDownloadImage from "../../hooks/useDownloadImage";
 
 // Function to calculate the linear regression trend line
 const calculateTrendLine = (data) => {
@@ -35,6 +35,26 @@ const calculateTrendLine = (data) => {
     });
 };
 
+const getVariableName = (variable) => {
+    const names = {
+        tas_min: "Min. Temperature (K)",
+        tas_max: "Max. Temperature (K)",
+        tas: "Average Temperature (K)",
+        hurs: "Relative Humidity (%)",
+        huss: "Specific Humidity (Mass fraction)",
+        total_precipitation: "Total Precipitation (m)",
+        precipitation_rate: "Precipitation Rate (g/m^2/s)",
+        snowfall: "Snowfall (m of water equivalent)",
+        snowmelt: "Snowmelt (m of water equivalent)",
+        spei: "SPEI",
+        ozone: "Ozone (Dobson Unit)",
+        ndvi: "NDVI",
+        sfc_windspeed: "Surface Wind Speed (m/s)",
+    };
+    return names[variable] || variable;
+};
+
+
 export default function LineChartComponent({
     selectedRegion,
     selectedDistrict,
@@ -46,17 +66,19 @@ export default function LineChartComponent({
         dateRange,
         selectedVariable
     );
-    const { downloadImage } = useDownloadImage(); 
+    const { downloadImage } = useDownloadImage();
 
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
                 <div className="bg-white p-4 border rounded">
-                    <p className="text-sm font-medium">{`Date: ${dayjs(
+                    <p className="text-sm font-medium">{`${dayjs(
                         label
                     ).format("MMM YYYY")}`}</p>
                     <p className="text-sm text-red-500">
-                        {`${selectedVariable}: ${payload[0].value}`}
+                        {`${getVariableName(selectedVariable)}: ${
+                            payload[0].value
+                        }`}
                     </p>
                 </div>
             );
@@ -90,7 +112,7 @@ export default function LineChartComponent({
     const trendLineData = calculateTrendLine(chartData);
 
     return (
-        <div className="bg-white p-4 rounded-lg mb-4 h-[400px]">
+        <div className="bg-white p-2 rounded-lg mb-4 h-[400px]">
             {loading ? (
                 <div className="flex justify-center items-center h-64">
                     <p className="text-gray-600">Loading data...</p>
@@ -106,7 +128,7 @@ export default function LineChartComponent({
                     <ResponsiveContainer width="100%" height={300} id="line">
                         <LineChart
                             data={chartData}
-                            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                            margin={{ top: 5, right: 10, left: 30, bottom: 5 }} 
                         >
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis
@@ -117,15 +139,17 @@ export default function LineChartComponent({
                                 tick={{ fontSize: 12 }}
                                 tickFormatter={(tick) =>
                                     dayjs(tick).format("MMM YYYY")
-                                } 
+                                }
                             />
                             <YAxis
                                 domain={calculateYAxisDomain()}
                                 label={{
-                                    value: `${selectedVariable}`,
+                                    value: getVariableName(selectedVariable),
                                     angle: -90,
                                     position: "insideLeft",
                                     style: { textAnchor: "middle" },
+                                    dx: -20, // Moves label slightly left
+                                    dy: 20, // Adjusts vertical alignment
                                 }}
                                 tickFormatter={(value) => value.toFixed(3)}
                                 allowDataOverflow={true}
@@ -135,19 +159,18 @@ export default function LineChartComponent({
                             <Line
                                 type="monotone"
                                 dataKey="value"
-                                name={selectedVariable}
+                                name={getVariableName(selectedVariable)}
                                 stroke="#FF6384"
                                 dot={false}
                                 activeDot={{ r: 6 }}
                                 isAnimationActive={false}
                             />
-                            {/* Add the dotted trend line with lighter green color */}
                             <Line
                                 type="linear"
                                 dataKey="value"
                                 name="trend"
-                                data={trendLineData} 
-                                stroke="#90EE90" 
+                                data={trendLineData}
+                                stroke="#90EE90"
                                 dot={false}
                                 strokeWidth={2}
                                 isAnimationActive={false}

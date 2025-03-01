@@ -55,7 +55,7 @@ const MapDownloader = ({ variable, date }) => {
             Generating Map...
           </>
         ) : (
-          'Download Map as PNG'
+          'PNG'
         )}
       </Button>
 

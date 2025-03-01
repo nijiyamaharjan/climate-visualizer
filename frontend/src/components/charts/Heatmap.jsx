@@ -4,100 +4,6 @@ import { useDataRange } from "../../hooks/useDataRange";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import { getColor } from "../utils/colorCodes";
 
-const generateColorLegend = (selectedVariable, minValue, maxValue) => {
-    let colorStops = [];
-    let labels = [];
-    
-    // Create appropriate color stops and labels based on the variable
-    if (selectedVariable === "tas_min" || selectedVariable === "tas_max" || selectedVariable === "tas") {
-        colorStops = [
-            "#FF0000", "#FF3300", "#FF6600", "#FF9900", 
-            "#FFCC00", "#FFFF00", "#FFFF66", "#99CCFF", 
-            "#66B3FF", "#3399FF", "#0066FF", "#0033CC", "#0000FF"
-        ];
-        const temp_range = maxValue - minValue;
-        labels = [
-            Math.round(maxValue) + "K", 
-            Math.round(minValue + temp_range/2) + "K", 
-            Math.round(minValue) + "K"
-        ];
-    } else if (selectedVariable === "ndvi") {
-        colorStops = [
-            "#006400", "#228B22", "#32CD32", "#66CDAA", 
-            "#98FB98", "#90EE90", "#B0E57C", "#C1F0A5", "#F0FFF0"
-        ];
-        labels = ["0.8", "0.4", "0.0"];
-    } else if (selectedVariable === "precipitation_rate") {
-        colorStops = [
-            "#0A0F44", "#203E73", "#3A77AD", "#6CA3DF", 
-            "#A3C8F1", "#C7E0FA", "#E9F4FF", "#7EC2FF", "#006BB3"
-        ];
-        labels = [maxValue.toFixed(1), (maxValue/2).toFixed(1), "0"];
-    } else if (selectedVariable === "spei") {
-        colorStops = [
-            "#00441B", "#1B7837", "#5AAE61", "#A6D96A", "#D9F0A3",
-            "#FFFFBF", "#FED976", "#FD8D3C", "#E31A1C", "#800026"
-        ];
-        labels = ["Extreme Wet", "Neutral", "Extreme Drought"];
-    } else if (selectedVariable === "ozone") {
-        colorStops = [
-            "#3F007D", "#7800B3", "#9C179E", "#D85799", 
-            "#F792B2", "#FDC9D8", "#FEE9EF", "#FFF5FA"
-        ];
-        labels = [maxValue.toFixed(1) + " DU", ((maxValue + minValue)/2).toFixed(1) + " DU", minValue.toFixed(1) + " DU"];
-    } else if (selectedVariable === "sfc_windspeed") {
-      colorStops = [
-          "#3E1A8E", "#5A2A9B", "#7F4AB8", "#9B6DCD", 
-          "#B79FDC", "#D4C1E8", "#E8D7F4", "#F1E5FB",
-          "D0D9F5", "#A3B9F2", "#7DA9EE", "#539FE5", "#1F8FD5", "#0F72B0"
-      ];
-      labels = [maxValue.toFixed(1), ((maxValue + minValue)/2).toFixed(1), minValue.toFixed(1)];
-  } else if (selectedVariable === "huss") {
-    colorStops = [
-        "#084594", "#2171b5", "#4292c6", "#6baed6", 
-        "#9ecae1", "#c6dbef", "#deebf7", "#fee090",
-        "fdae61", "#f46d43"
-    ];
-    labels = [maxValue.toFixed(1), ((maxValue + minValue)/2).toFixed(1), minValue.toFixed(1)];
-} else if (selectedVariable === "hurs") {
-  colorStops = [
-      "#54278f", "#08519c", "#3182bd", "#6baed6", 
-      "#9ecae1", "#c6dbef", "#edf8b1", "#fdae61",
-      "#f46d43", "#d73027", "#a50026"
-  ];
-  labels = [maxValue.toFixed(1), ((maxValue + minValue)/2).toFixed(1), minValue.toFixed(1)];
-} else if (selectedVariable === "snowfall") {
-  colorStops = [
-      "#003366", "#004488", "#0055AA", "#0077CC", 
-      "#3399DD", "#66BBEE", "#99DDF8", "#D8EBFD",
-      "#C7E0FA"
-  ];
-  labels = [maxValue.toFixed(1), ((maxValue + minValue)/2).toFixed(1), minValue.toFixed(1)];
-} else if (selectedVariable === "snowmelt") {
-  colorStops = [
-      "#0A0F44", "#162A5B", "#203E73", "#2B5A91", 
-      "#3A77AD", "#518ECC", "#6CA3DF", "#87B6E9",
-      "#A3C8F1", "#B7D5F6", "#C7E0FA", "#D8EBFD"
-  ];
-  labels = [maxValue.toFixed(1), ((maxValue + minValue)/2).toFixed(1), minValue.toFixed(1)];
-} else if (selectedVariable === "total_precipitation") {
-  colorStops = [
-      "#08306b", "#08519c", "#2171b5", "#4292c6", 
-      "#6baed6", "#9ecae1", "#c6dbef", "#deebf7",
-      "#f7fbff", "#ffffff"
-  ];
-  labels = [maxValue.toFixed(1), ((maxValue + minValue)/2).toFixed(1), minValue.toFixed(1)];
-} else {
-        colorStops = [
-            "#3E1A8E", "#7F4AB8", "#B79FDC", "#E8D7F4", 
-            "#D0D9F5", "#7DA9EE", "#1F8FD5", "#0F72B0"
-        ];
-        labels = [maxValue.toFixed(3), ((maxValue + minValue)/2).toFixed(3), minValue.toFixed(3)];
-    }
-    
-    return { colorStops, labels };
-};
-
 const HeatmapComponent = ({
   selectedRegion,
   selectedDistrict,
@@ -159,10 +65,6 @@ const HeatmapComponent = ({
     return { monthlyData, yearColumns, minValue, maxValue };
   }, [chartData]);
 
-  const { colorStops, labels } = useMemo(() => 
-    generateColorLegend(selectedVariable, minValue, maxValue), 
-    [selectedVariable, minValue, maxValue]
-  );
 
   const getVariableName = (variable) => {
     const names = {

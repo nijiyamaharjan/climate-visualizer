@@ -37,7 +37,7 @@ const CompareLocationsDropdown = ({
     const variableDateRanges = {
         tas_min: { startYear: 1950, endYear: 2100 },
         tas_max: { startYear: 1950, endYear: 2100 },
-        tas: { startYear: 1950, endYear: 210 },
+        tas: { startYear: 1950, endYear: 2100 },
         precipitation_rate: { startYear: 1950, endYear: 2100 },
         total_precipitation: { startYear: 1950, endYear: 2025 },
         hurs: { startYear: 1950, endYear: 2100 },
@@ -78,37 +78,33 @@ const CompareLocationsDropdown = ({
         });
     };
 
-    const handleVariableChange = (selectedOptions) => {
-        // Ensure selectedOptions is an array
-        const selectedValues = Array.isArray(selectedOptions)
-            ? selectedOptions.map((opt) => opt.value)
-            : [];
-
-        setVariable(selectedValues[0]); // Update only the first selected variable
-        onVariableChange(selectedValues);
-
+    const handleVariableChange = (selectedOption) => {
+        const selectedValue = selectedOption.target.value
+        console.log(selectedValue, 'sel')
+        setSelectedVariable(selectedValue); // Update only the first selected variable
+        onVariableChange(selectedValue);
+    
         // Find the most restrictive date range
         let minYear = 1950,
             maxYear = 2100;
-        selectedValues.forEach((variable) => {
-            const { startYear, endYear } = variableDateRanges[variable] || {
+            const { startYear, endYear } = variableDateRanges[selectedValue] || {
                 startYear: 1950,
                 endYear: 2100,
             };
             minYear = Math.max(minYear, startYear);
             maxYear = Math.min(maxYear, endYear);
-        });
-
+        // });
+    
         // Log the selected year range
         console.log("Available Year Range:", minYear, maxYear);
-
+    
         // Update available years
         setAvailableYears(
             Array.from({ length: maxYear - minYear + 1 }, (_, i) =>
                 (minYear + i).toString()
             )
         );
-
+    
         // Reset selected dates if they are out of range
         setDateSelections((prev) => ({
             startMonth: prev.startMonth,
@@ -123,7 +119,7 @@ const CompareLocationsDropdown = ({
                     : "",
         }));
     };
-
+    
     const handleDistrictChange = (selectedOptions) => {
         const selectedValues = selectedOptions.map((option) => option.value); // Get selected district values
         setSelectedDistricts(selectedValues); // Update local state
@@ -191,7 +187,7 @@ const CompareLocationsDropdown = ({
                             name="startMonth"
                             value={dateSelections.startMonth}
                             onChange={handleDateChange}
-                            className="border rounded-md px-3 py-2 w-24"
+                            className="border rounded-md px-3 py-2 w-32"
                         >
                             <option value="">Month</option>
                             {months.map((month) => (
@@ -224,7 +220,7 @@ const CompareLocationsDropdown = ({
                             name="endMonth"
                             value={dateSelections.endMonth}
                             onChange={handleDateChange}
-                            className="border rounded-md px-3 py-2 w-24"
+                            className="border rounded-md px-3 py-2 w-32"
                         >
                             <option value="">Month</option>
                             {months.map((month) => (

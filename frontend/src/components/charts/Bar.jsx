@@ -29,9 +29,11 @@ const BarChartComponent = ({
         if (active && payload && payload.length) {
             return (
                 <div className="bg-white p-4 border rounded shadow">
-                    <p className="text-sm font-medium">{`Date: ${label}`}</p>
+                    <p className="text-sm font-medium">{`${label}`}</p>
                     <p className="text-sm text-red-500">
-                        {`${selectedVariable}: ${payload[0].value}`}
+                        {`${getVariableName(selectedVariable)}: ${
+                            payload[0].value
+                        }`}
                     </p>
                 </div>
             );
@@ -61,6 +63,25 @@ const BarChartComponent = ({
         );
     }
 
+    const getVariableName = (variable) => {
+        const names = {
+            tas_min: "Min. Temperature (K)",
+            tas_max: "Max. Temperature (K)",
+            tas: "Average Temperature (K)",
+            hurs: "Relative Humidity (%)",
+            huss: "Specific Humidity (Mass fraction)",
+            total_precipitation: "Total Precipitation (m)",
+            precipitation_rate: "Precipitation Rate (g/m^2/s)",
+            snowfall: "Snowfall (m of water equivalent)",
+            snowmelt: "Snowmelt (m of water equivalent)",
+            spei: "SPEI",
+            ozone: "Ozone (Dobson Unit)",
+            ndvi: "NDVI",
+            sfc_windspeed: "Surface Wind Speed (m/s)",
+        };
+        return names[variable] || variable;
+    };
+
     return (
         <div className="bg-white p-4 rounded-lg mb-4 flex flex-col h-[400px]">
             {loading ? (
@@ -76,22 +97,34 @@ const BarChartComponent = ({
             ) : (
                 <div className="flex-grow">
                     <ResponsiveContainer width="100%" height={300} id="bar">
-                        <BarChart width={800} height={300} data={chartData}>
+                        <BarChart
+                            width={800}
+                            height={300}
+                            data={chartData}
+                            margin={{ top: 5, right: 10, left: 30, bottom: 5 }} // Adjust left margin
+                        >
                             <CartesianGrid stroke="#ccc" />
                             <XAxis
                                 dataKey="date"
+                                angle={-45}
+                                textAnchor="end"
+                                height={70}
+                                tick={{ fontSize: 12 }}
                                 tickFormatter={(tick) =>
                                     dayjs(tick).format("MMM YYYY")
                                 }
-                                tick={{ fontSize: 8 }}
                             />
                             <YAxis
                                 domain={calculateYAxisDomain()}
                                 label={{
-                                    value: `${selectedVariable}`,
+                                    value: `${getVariableName(
+                                        getVariableName(selectedVariable)
+                                    )}`,
                                     angle: -90,
                                     position: "insideLeft",
                                     style: { textAnchor: "middle" },
+                                    dx: -20, // Moves label slightly left
+                                    dy: 20, // Adjusts vertical alignment
                                 }}
                                 tickFormatter={(value) => value.toFixed(3)}
                                 allowDataOverflow={true}
@@ -100,7 +133,13 @@ const BarChartComponent = ({
                                 content={<CustomTooltip />}
                                 cursor={false}
                             />
-                            <Legend formatter={() => selectedVariable} />{" "}
+                            <Legend
+                                formatter={() =>
+                                    getVariableName(
+                                        getVariableName(selectedVariable)
+                                    )
+                                }
+                            />{" "}
                             <Bar
                                 dataKey="value"
                                 fill="#FF6384"
