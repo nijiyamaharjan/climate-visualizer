@@ -145,7 +145,7 @@ app.post("/api/generate-map", async (req, res) => {
                                 const style = (feature) => {
                                     const value = feature.properties['${variable}'];
                                     let fillColor;
-                                    if ('${variable}' === 'tas_min') {
+                                    if ('${variable}' === 'tas_min || ${variable}' === 'tas_max' || ${variable}' === 'tas) {
                                       fillColor = value > 310 ? '#FF0000' :
                                                 value > 305 ? '#FF3300' :
                                                 value > 300 ? '#FF6600' :
@@ -195,6 +195,29 @@ app.post("/api/generate-map", async (req, res) => {
                                           value > 0.35 ? '#4AB5FF' :
                                           value > 0.27 ? '#1B8CFF' :
                                           '#006BB3';
+                                  } else if ('${variable}' === 'huss') {
+                                      fillColor = value > 0.034 ? '#084594' :
+                                          value > 0.025 ? '#2171b5' :
+                                          value > 0.018 ? '#4292c6' :
+                                          value > 0.014 ? '#6baed6' :
+                                          value > 0.010 ? '#9ecae1' :
+                                          value > 0.007 ? '#c6dbef' :
+                                          value > 0.005 ? '#deebf7' :
+                                          value > 0.002 ? '#fee090' :
+                                          value > 0.0005 ? '#fdae61' :
+                                          '#f46d43';
+                                  } else if ('${variable}' === 'hurs') {
+                                      fillColor = value > 100 ? '#54278f' :
+                                          value > 90 ? '#08519c' :
+                                          value > 80 ? '#3182bd' :
+                                          value > 70 ? '#6baed6' :
+                                          value > 60 ? '#9ecae1' :
+                                          value > 50 ? '#c6dbef' :
+                                          value > 40 ? '#edf8b1' :
+                                          value > 30 ? '#fdae61' :
+                                          value > 20 ? '#f46d43' :
+                                          value > 10 ? '#d73027' :
+                                          '#a50026';
                                   } else if ('${variable}' === 'snowfall') {
                                       fillColor = value > 0.01 ? '#003366' :
                                           value > 0.005 ? '#004488' :
@@ -243,20 +266,6 @@ app.post("/api/generate-map", async (req, res) => {
                                           value > 250 ? '#FDD9E2' :
                                           value > 240 ? '#FEE9EF' :
                                           '#FFF5FA';
-                                  } else if ('${variable}' === 'tas_max') {
-                                      fillColor = value > 310 ? '#FF0000' :
-                                          value > 305 ? '#FF3300' :
-                                          value > 300 ? '#FF6600' :
-                                          value > 295 ? '#FF9900' :
-                                          value > 290 ? '#FFCC00' :
-                                          value > 285 ? '#FFFF00' :
-                                          value > 280 ? '#FFFF66' :
-                                          value > 275 ? '#99CCFF' :
-                                          value > 270 ? '#66B3FF' :
-                                          value > 265 ? '#3399FF' :
-                                          value > 260 ? '#0066FF' :
-                                          value > 255 ? '#0033CC' :
-                                          '#0000FF';
                                   } else if ('${variable}' === 'ndvi') {
                                       fillColor = value > 0.75 ? '#006400' :
                                           value > 0.65 ? '#228B22' :
@@ -267,6 +276,17 @@ app.post("/api/generate-map", async (req, res) => {
                                           value > 0.15 ? '#B0E57C' :
                                           value > 0.05 ? '#C1F0A5' :
                                           '#F0FFF0';
+                                  } else if ('${variable}' === 'total_precipitation') {
+                                      fillColor = value > 32.84 ? '#08306b' :
+                                          value > 20 ? '#08519c' :
+                                          value > 10 ? '#2171b5' :
+                                          value > 5 ? '#4292c6' :
+                                          value > 2 ? '#6baed6' :
+                                          value > 1.5 ? '#9ecae1' :
+                                          value > 0.5 ? '#c6dbef' :
+                                          value > 0.3 ? '#deebf7' :
+                                          value > 0 ? '#f7fbff' :
+                                          '#ffffff';
                                   } else {
                                       fillColor = '#cccccc';
                                   }
@@ -435,131 +455,151 @@ app.post("/api/generate-map-range", async (req, res) => {
                                 const style = (feature) => {
                                     const value = feature.properties['${variable}'];
                                     let fillColor;
-                                    if ('${variable}' === 'tas_min') {
-                                        fillColor = value > 310 ? '#FF0000' :
-                                                  value > 305 ? '#FF3300' :
-                                                  value > 300 ? '#FF6600' :
-                                                  value > 295 ? '#FF9900' :
-                                                  value > 290 ? '#FFCC00' :
-                                                  value > 285 ? '#FFFF00' :
-                                                  value > 280 ? '#FFFF66' :
-                                                  value > 275 ? '#99CCFF' :
-                                                  value > 270 ? '#66B3FF' :
-                                                  value > 265 ? '#3399FF' :
-                                                  value > 260 ? '#0066FF' :
-                                                  value > 255 ? '#0033CC' :
-                                                  '#0000FF';
-                                    } else if ('${variable}' === 'sfc_windspeed'){
-                                        fillColor = value > 3.9 ? '#3E1A8E' :  
-                                            value > 3.8 ? '#5A2A9B' :  
-                                            value > 3.7 ? '#7F4AB8' :  
-                                            value > 3.6 ? '#9B6DCD' :  
-                                            value > 3.5 ? '#B79FDC' :  
-                                            value > 3.4 ? '#D4C1E8' :  
-                                            value > 3.3 ? '#E8D7F4' :  
-                                            value > 3.2 ? '#F1E5FB' :  
-                                            value > 3.1 ? '#D0D9F5' :  
-                                            value > 3 ? '#A3B9F2' :  
-                                            value > 2.9 ? '#7DA9EE' :  
-                                            value > 2.8 ? '#539FE5' :  
-                                            value > 2.7 ? '#1F8FD5' :  
-                                            '#0F72B0';  
-                                    } else if ('${variable}' === 'precipitation_rate') {
-                                        fillColor = value > 30 ? '#0A0F44' :
-                                            value > 20 ? '#162A5B' :
-                                            value > 10 ? '#203E73' :
-                                            value > 7 ? '#2B5A91' :
-                                            value > 5 ? '#3A77AD' :
-                                            value > 4 ? '#518ECC' :
-                                            value > 3 ? '#6CA3DF' :
-                                            value > 2 ? '#87B6E9' :
-                                            value > 1.76 ? '#A3C8F1' :
-                                            value > 1.5 ? '#B7D5F6' :
-                                            value > 1.2 ? '#C7E0FA' :
-                                            value > 1.0 ? '#D8EBFD' :
-                                            value > 0.8 ? '#E9F4FF' :
-                                            value > 0.76 ? '#E0F7FF' :
-                                            value > 0.6 ? '#D1F2FF' :
-                                            value > 0.5 ? '#A3D8FF' :
-                                            value > 0.4 ? '#7EC2FF' :
-                                            value > 0.35 ? '#4AB5FF' :
-                                            value > 0.27 ? '#1B8CFF' :
-                                            '#006BB3';
-                                    } else if ('${variable}' === 'snowfall') {
-                                        fillColor = value > 0.01 ? '#003366' :
-                                            value > 0.005 ? '#004488' :
-                                            value > 0.002 ? '#0055AA' :
-                                            value > 0.001 ? '#0077CC' :
-                                            value > 0.0005 ? '#3399DD' :
-                                            value > 0.0001 ? '#66BBEE' :
-                                            value > 0.00001 ? '#99DDF8' :
-                                            value > 0.000001 ? '#D8EBFD' :
-                                            '#C7E0FA';
-                                    } else if ('${variable}' === 'snowmelt') {
-                                        fillColor = value > 0.01 ? '#0A0F44' :
-                                            value > 0.005 ? '#162A5B' :
-                                            value > 0.001 ? '#203E73' :
-                                            value > 0.0005 ? '#2B5A91' :
-                                            value > 0.0002 ? '#3A77AD' :
-                                            value > 0.0001 ? '#518ECC' :
-                                            value > 0.00001 ? '#6CA3DF' :
-                                            value > 1e-6 ? '#87B6E9' :
-                                            value > 1e-7 ? '#A3C8F1' :
-                                            value > 1e-9 ? '#B7D5F6' :
-                                            value > 1e-11 ? '#C7E0FA' :
-                                            '#D8EBFD';
-                                    } else if ('${variable}' === 'spei') {
-                                        fillColor = value > 3 ? '#00441B' :
-                                            value > 2 ? '#1B7837' :
-                                            value > 1 ? '#5AAE61' :
-                                            value > 0.6 ? '#A6D96A' :
-                                            value > 0.1 ? '#D9F0A3' :
-                                            value > -0.1 ? '#FFFFBF' :
-                                            value > -0.8 ? '#FED976' :
-                                            value > -2 ? '#FD8D3C' :
-                                            value > -3 ? '#E31A1C' :
-                                            '#800026';
-                                    } else if ('${variable}' === 'ozone') {
-                                        fillColor = value > 320 ? '#3F007D' :
-                                            value > 310 ? '#5E009A' :
-                                            value > 300 ? '#7800B3' :
-                                            value > 290 ? '#9C179E' :
-                                            value > 280 ? '#C22F89' :
-                                            value > 275 ? '#D85799' :
-                                            value > 270 ? '#E67BA7' :
-                                            value > 265 ? '#F792B2' :
-                                            value > 260 ? '#FAB9CD' :
-                                            value > 255 ? '#FDC9D8' :
-                                            value > 250 ? '#FDD9E2' :
-                                            value > 240 ? '#FEE9EF' :
-                                            '#FFF5FA';
-                                    } else if ('${variable}' === 'tas_max') {
-                                        fillColor = value > 310 ? '#FF0000' :
-                                            value > 305 ? '#FF3300' :
-                                            value > 300 ? '#FF6600' :
-                                            value > 295 ? '#FF9900' :
-                                            value > 290 ? '#FFCC00' :
-                                            value > 285 ? '#FFFF00' :
-                                            value > 280 ? '#FFFF66' :
-                                            value > 275 ? '#99CCFF' :
-                                            value > 270 ? '#66B3FF' :
-                                            value > 265 ? '#3399FF' :
-                                            value > 260 ? '#0066FF' :
-                                            value > 255 ? '#0033CC' :
-                                            '#0000FF';
-                                    } else if ('${variable}' === 'ndvi') {
-                                        fillColor = value > 0.75 ? '#006400' :
-                                            value > 0.65 ? '#228B22' :
-                                            value > 0.55 ? '#32CD32' :
-                                            value > 0.45 ? '#66CDAA' :
-                                            value > 0.35 ? '#98FB98' :
-                                            value > 0.25 ? '#90EE90' :
-                                            value > 0.15 ? '#B0E57C' :
-                                            value > 0.05 ? '#C1F0A5' :
-                                            '#F0FFF0';
-                                    } else {
-                                        fillColor = '#cccccc';
-                                    }
+                                    if ('${variable}' === 'tas_min || ${variable}' === 'tas_max' || ${variable}' === 'tas) {
+                                      fillColor = value > 310 ? '#FF0000' :
+                                                value > 305 ? '#FF3300' :
+                                                value > 300 ? '#FF6600' :
+                                                value > 295 ? '#FF9900' :
+                                                value > 290 ? '#FFCC00' :
+                                                value > 285 ? '#FFFF00' :
+                                                value > 280 ? '#FFFF66' :
+                                                value > 275 ? '#99CCFF' :
+                                                value > 270 ? '#66B3FF' :
+                                                value > 265 ? '#3399FF' :
+                                                value > 260 ? '#0066FF' :
+                                                value > 255 ? '#0033CC' :
+                                                '#0000FF';
+                                  } else if ('${variable}' === 'sfc_windspeed'){
+                                      fillColor = value > 3.9 ? '#3E1A8E' :  
+                                          value > 3.8 ? '#5A2A9B' :  
+                                          value > 3.7 ? '#7F4AB8' :  
+                                          value > 3.6 ? '#9B6DCD' :  
+                                          value > 3.5 ? '#B79FDC' :  
+                                          value > 3.4 ? '#D4C1E8' :  
+                                          value > 3.3 ? '#E8D7F4' :  
+                                          value > 3.2 ? '#F1E5FB' :  
+                                          value > 3.1 ? '#D0D9F5' :  
+                                          value > 3 ? '#A3B9F2' :  
+                                          value > 2.9 ? '#7DA9EE' :  
+                                          value > 2.8 ? '#539FE5' :  
+                                          value > 2.7 ? '#1F8FD5' :  
+                                          '#0F72B0';  
+                                  } else if ('${variable}' === 'precipitation_rate') {
+                                      fillColor = value > 30 ? '#0A0F44' :
+                                          value > 20 ? '#162A5B' :
+                                          value > 10 ? '#203E73' :
+                                          value > 7 ? '#2B5A91' :
+                                          value > 5 ? '#3A77AD' :
+                                          value > 4 ? '#518ECC' :
+                                          value > 3 ? '#6CA3DF' :
+                                          value > 2 ? '#87B6E9' :
+                                          value > 1.76 ? '#A3C8F1' :
+                                          value > 1.5 ? '#B7D5F6' :
+                                          value > 1.2 ? '#C7E0FA' :
+                                          value > 1.0 ? '#D8EBFD' :
+                                          value > 0.8 ? '#E9F4FF' :
+                                          value > 0.76 ? '#E0F7FF' :
+                                          value > 0.6 ? '#D1F2FF' :
+                                          value > 0.5 ? '#A3D8FF' :
+                                          value > 0.4 ? '#7EC2FF' :
+                                          value > 0.35 ? '#4AB5FF' :
+                                          value > 0.27 ? '#1B8CFF' :
+                                          '#006BB3';
+                                  } else if ('${variable}' === 'huss') {
+                                      fillColor = value > 0.034 ? '#084594' :
+                                          value > 0.025 ? '#2171b5' :
+                                          value > 0.018 ? '#4292c6' :
+                                          value > 0.014 ? '#6baed6' :
+                                          value > 0.010 ? '#9ecae1' :
+                                          value > 0.007 ? '#c6dbef' :
+                                          value > 0.005 ? '#deebf7' :
+                                          value > 0.002 ? '#fee090' :
+                                          value > 0.0005 ? '#fdae61' :
+                                          '#f46d43';
+                                  } else if ('${variable}' === 'hurs') {
+                                      fillColor = value > 100 ? '#54278f' :
+                                          value > 90 ? '#08519c' :
+                                          value > 80 ? '#3182bd' :
+                                          value > 70 ? '#6baed6' :
+                                          value > 60 ? '#9ecae1' :
+                                          value > 50 ? '#c6dbef' :
+                                          value > 40 ? '#edf8b1' :
+                                          value > 30 ? '#fdae61' :
+                                          value > 20 ? '#f46d43' :
+                                          value > 10 ? '#d73027' :
+                                          '#a50026';
+                                  } else if ('${variable}' === 'snowfall') {
+                                      fillColor = value > 0.01 ? '#003366' :
+                                          value > 0.005 ? '#004488' :
+                                          value > 0.002 ? '#0055AA' :
+                                          value > 0.001 ? '#0077CC' :
+                                          value > 0.0005 ? '#3399DD' :
+                                          value > 0.0001 ? '#66BBEE' :
+                                          value > 0.00001 ? '#99DDF8' :
+                                          value > 0.000001 ? '#D8EBFD' :
+                                          '#C7E0FA';
+                                  } else if ('${variable}' === 'snowmelt') {
+                                      fillColor = value > 0.01 ? '#0A0F44' :
+                                          value > 0.005 ? '#162A5B' :
+                                          value > 0.001 ? '#203E73' :
+                                          value > 0.0005 ? '#2B5A91' :
+                                          value > 0.0002 ? '#3A77AD' :
+                                          value > 0.0001 ? '#518ECC' :
+                                          value > 0.00001 ? '#6CA3DF' :
+                                          value > 1e-6 ? '#87B6E9' :
+                                          value > 1e-7 ? '#A3C8F1' :
+                                          value > 1e-9 ? '#B7D5F6' :
+                                          value > 1e-11 ? '#C7E0FA' :
+                                          '#D8EBFD';
+                                  } else if ('${variable}' === 'spei') {
+                                      fillColor = value > 3 ? '#00441B' :
+                                          value > 2 ? '#1B7837' :
+                                          value > 1 ? '#5AAE61' :
+                                          value > 0.6 ? '#A6D96A' :
+                                          value > 0.1 ? '#D9F0A3' :
+                                          value > -0.1 ? '#FFFFBF' :
+                                          value > -0.8 ? '#FED976' :
+                                          value > -2 ? '#FD8D3C' :
+                                          value > -3 ? '#E31A1C' :
+                                          '#800026';
+                                  } else if ('${variable}' === 'ozone') {
+                                      fillColor = value > 320 ? '#3F007D' :
+                                          value > 310 ? '#5E009A' :
+                                          value > 300 ? '#7800B3' :
+                                          value > 290 ? '#9C179E' :
+                                          value > 280 ? '#C22F89' :
+                                          value > 275 ? '#D85799' :
+                                          value > 270 ? '#E67BA7' :
+                                          value > 265 ? '#F792B2' :
+                                          value > 260 ? '#FAB9CD' :
+                                          value > 255 ? '#FDC9D8' :
+                                          value > 250 ? '#FDD9E2' :
+                                          value > 240 ? '#FEE9EF' :
+                                          '#FFF5FA';
+                                  } else if ('${variable}' === 'ndvi') {
+                                      fillColor = value > 0.75 ? '#006400' :
+                                          value > 0.65 ? '#228B22' :
+                                          value > 0.55 ? '#32CD32' :
+                                          value > 0.45 ? '#66CDAA' :
+                                          value > 0.35 ? '#98FB98' :
+                                          value > 0.25 ? '#90EE90' :
+                                          value > 0.15 ? '#B0E57C' :
+                                          value > 0.05 ? '#C1F0A5' :
+                                          '#F0FFF0';
+                                  } else if ('${variable}' === 'total_precipitation') {
+                                      fillColor = value > 32.84 ? '#08306b' :
+                                          value > 20 ? '#08519c' :
+                                          value > 10 ? '#2171b5' :
+                                          value > 5 ? '#4292c6' :
+                                          value > 2 ? '#6baed6' :
+                                          value > 1.5 ? '#9ecae1' :
+                                          value > 0.5 ? '#c6dbef' :
+                                          value > 0.3 ? '#deebf7' :
+                                          value > 0 ? '#f7fbff' :
+                                          '#ffffff';
+                                  } else {
+                                      fillColor = '#cccccc';
+                                  }
 
                                     return {
                                         fillColor: fillColor,
@@ -730,23 +770,151 @@ app.get("/api/debug-map-html", async (req, res) => {
                                 console.log('Styling feature:', feature.properties.district, 'value:', value);
                                 
                                 let fillColor;
-                                if ('${variable}' === 'tas_min') {
-                                    const tempCelsius = value - 273.15;
-                                    fillColor = tempCelsius > 40 ? '#800026' :
-                                              tempCelsius > 30 ? '#BD0026' :
-                                              tempCelsius > 20 ? '#E31A1C' :
-                                              tempCelsius > 10 ? '#FC4E2A' :
-                                              tempCelsius > 0  ? '#FD8D3C' :
-                                              tempCelsius > -10 ? '#6BAED6' :
-                                              '#08519C';
-                                } else {
-                                    fillColor = value > 3.9 ? '#3E1A8E' :
-                                              value > 3.8 ? '#5A2A9B' :
-                                              value > 3.7 ? '#7F4AB8' :
-                                              value > 3.6 ? '#9B6DCD' :
-                                              value > 3.5 ? '#B79FDC' :
-                                              '#D4C1E8';
-                                }
+                                    if ('${variable}' === 'tas_min || ${variable}' === 'tas_max' || ${variable}' === 'tas) {
+                                      fillColor = value > 310 ? '#FF0000' :
+                                                value > 305 ? '#FF3300' :
+                                                value > 300 ? '#FF6600' :
+                                                value > 295 ? '#FF9900' :
+                                                value > 290 ? '#FFCC00' :
+                                                value > 285 ? '#FFFF00' :
+                                                value > 280 ? '#FFFF66' :
+                                                value > 275 ? '#99CCFF' :
+                                                value > 270 ? '#66B3FF' :
+                                                value > 265 ? '#3399FF' :
+                                                value > 260 ? '#0066FF' :
+                                                value > 255 ? '#0033CC' :
+                                                '#0000FF';
+                                  } else if ('${variable}' === 'sfc_windspeed'){
+                                      fillColor = value > 3.9 ? '#3E1A8E' :  
+                                          value > 3.8 ? '#5A2A9B' :  
+                                          value > 3.7 ? '#7F4AB8' :  
+                                          value > 3.6 ? '#9B6DCD' :  
+                                          value > 3.5 ? '#B79FDC' :  
+                                          value > 3.4 ? '#D4C1E8' :  
+                                          value > 3.3 ? '#E8D7F4' :  
+                                          value > 3.2 ? '#F1E5FB' :  
+                                          value > 3.1 ? '#D0D9F5' :  
+                                          value > 3 ? '#A3B9F2' :  
+                                          value > 2.9 ? '#7DA9EE' :  
+                                          value > 2.8 ? '#539FE5' :  
+                                          value > 2.7 ? '#1F8FD5' :  
+                                          '#0F72B0';  
+                                  } else if ('${variable}' === 'precipitation_rate') {
+                                      fillColor = value > 30 ? '#0A0F44' :
+                                          value > 20 ? '#162A5B' :
+                                          value > 10 ? '#203E73' :
+                                          value > 7 ? '#2B5A91' :
+                                          value > 5 ? '#3A77AD' :
+                                          value > 4 ? '#518ECC' :
+                                          value > 3 ? '#6CA3DF' :
+                                          value > 2 ? '#87B6E9' :
+                                          value > 1.76 ? '#A3C8F1' :
+                                          value > 1.5 ? '#B7D5F6' :
+                                          value > 1.2 ? '#C7E0FA' :
+                                          value > 1.0 ? '#D8EBFD' :
+                                          value > 0.8 ? '#E9F4FF' :
+                                          value > 0.76 ? '#E0F7FF' :
+                                          value > 0.6 ? '#D1F2FF' :
+                                          value > 0.5 ? '#A3D8FF' :
+                                          value > 0.4 ? '#7EC2FF' :
+                                          value > 0.35 ? '#4AB5FF' :
+                                          value > 0.27 ? '#1B8CFF' :
+                                          '#006BB3';
+                                  } else if ('${variable}' === 'huss') {
+                                      fillColor = value > 0.034 ? '#084594' :
+                                          value > 0.025 ? '#2171b5' :
+                                          value > 0.018 ? '#4292c6' :
+                                          value > 0.014 ? '#6baed6' :
+                                          value > 0.010 ? '#9ecae1' :
+                                          value > 0.007 ? '#c6dbef' :
+                                          value > 0.005 ? '#deebf7' :
+                                          value > 0.002 ? '#fee090' :
+                                          value > 0.0005 ? '#fdae61' :
+                                          '#f46d43';
+                                  } else if ('${variable}' === 'hurs') {
+                                      fillColor = value > 100 ? '#54278f' :
+                                          value > 90 ? '#08519c' :
+                                          value > 80 ? '#3182bd' :
+                                          value > 70 ? '#6baed6' :
+                                          value > 60 ? '#9ecae1' :
+                                          value > 50 ? '#c6dbef' :
+                                          value > 40 ? '#edf8b1' :
+                                          value > 30 ? '#fdae61' :
+                                          value > 20 ? '#f46d43' :
+                                          value > 10 ? '#d73027' :
+                                          '#a50026';
+                                  } else if ('${variable}' === 'snowfall') {
+                                      fillColor = value > 0.01 ? '#003366' :
+                                          value > 0.005 ? '#004488' :
+                                          value > 0.002 ? '#0055AA' :
+                                          value > 0.001 ? '#0077CC' :
+                                          value > 0.0005 ? '#3399DD' :
+                                          value > 0.0001 ? '#66BBEE' :
+                                          value > 0.00001 ? '#99DDF8' :
+                                          value > 0.000001 ? '#D8EBFD' :
+                                          '#C7E0FA';
+                                  } else if ('${variable}' === 'snowmelt') {
+                                      fillColor = value > 0.01 ? '#0A0F44' :
+                                          value > 0.005 ? '#162A5B' :
+                                          value > 0.001 ? '#203E73' :
+                                          value > 0.0005 ? '#2B5A91' :
+                                          value > 0.0002 ? '#3A77AD' :
+                                          value > 0.0001 ? '#518ECC' :
+                                          value > 0.00001 ? '#6CA3DF' :
+                                          value > 1e-6 ? '#87B6E9' :
+                                          value > 1e-7 ? '#A3C8F1' :
+                                          value > 1e-9 ? '#B7D5F6' :
+                                          value > 1e-11 ? '#C7E0FA' :
+                                          '#D8EBFD';
+                                  } else if ('${variable}' === 'spei') {
+                                      fillColor = value > 3 ? '#00441B' :
+                                          value > 2 ? '#1B7837' :
+                                          value > 1 ? '#5AAE61' :
+                                          value > 0.6 ? '#A6D96A' :
+                                          value > 0.1 ? '#D9F0A3' :
+                                          value > -0.1 ? '#FFFFBF' :
+                                          value > -0.8 ? '#FED976' :
+                                          value > -2 ? '#FD8D3C' :
+                                          value > -3 ? '#E31A1C' :
+                                          '#800026';
+                                  } else if ('${variable}' === 'ozone') {
+                                      fillColor = value > 320 ? '#3F007D' :
+                                          value > 310 ? '#5E009A' :
+                                          value > 300 ? '#7800B3' :
+                                          value > 290 ? '#9C179E' :
+                                          value > 280 ? '#C22F89' :
+                                          value > 275 ? '#D85799' :
+                                          value > 270 ? '#E67BA7' :
+                                          value > 265 ? '#F792B2' :
+                                          value > 260 ? '#FAB9CD' :
+                                          value > 255 ? '#FDC9D8' :
+                                          value > 250 ? '#FDD9E2' :
+                                          value > 240 ? '#FEE9EF' :
+                                          '#FFF5FA';
+                                  } else if ('${variable}' === 'ndvi') {
+                                      fillColor = value > 0.75 ? '#006400' :
+                                          value > 0.65 ? '#228B22' :
+                                          value > 0.55 ? '#32CD32' :
+                                          value > 0.45 ? '#66CDAA' :
+                                          value > 0.35 ? '#98FB98' :
+                                          value > 0.25 ? '#90EE90' :
+                                          value > 0.15 ? '#B0E57C' :
+                                          value > 0.05 ? '#C1F0A5' :
+                                          '#F0FFF0';
+                                  } else if ('${variable}' === 'total_precipitation') {
+                                      fillColor = value > 32.84 ? '#08306b' :
+                                          value > 20 ? '#08519c' :
+                                          value > 10 ? '#2171b5' :
+                                          value > 5 ? '#4292c6' :
+                                          value > 2 ? '#6baed6' :
+                                          value > 1.5 ? '#9ecae1' :
+                                          value > 0.5 ? '#c6dbef' :
+                                          value > 0.3 ? '#deebf7' :
+                                          value > 0 ? '#f7fbff' :
+                                          '#ffffff';
+                                  } else {
+                                      fillColor = '#cccccc';
+                                  }
 
                                 return {
                                     fillColor: fillColor,

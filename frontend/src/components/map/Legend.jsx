@@ -12,6 +12,7 @@ function Legend({ variable, date }) {
             switch (variable) {
                 case "tas_min":
                 case "tas_max":
+                case "tas":
                     return [
                         { value: 255, label: "< 255 K" },
                         { value: 260, label: "255-260 K" },
@@ -66,6 +67,32 @@ function Legend({ variable, date }) {
                         { value: 20, label: "10-20" },
                         { value: 30, label: "20-30" },
                         { value: 40, label: "> 30" },
+                    ];
+                case "huss":
+                    return [
+                        { value: 0.0005, label: "< 0.0005" },
+                        { value: 0.002, label: "0.002-0.005" },
+                        { value: 0.005, label: "0.005-0.007" },
+                        { value: 0.007, label: "0.007-0.010" },
+                        { value: 0.010, label: "0.010-0.014" },
+                        { value: 0.014, label: "0.014-0.018" },
+                        { value: 0.018 , label: "0.018-0.025" },
+                        { value: 0.025, label: "0.025-0.034" },
+                        { value: 0.034 , label: "> 0.034" },
+                    ];
+                case "hurs":
+                    return [
+                        { value: 10, label: "10-20" },
+                        { value: 20, label: "20-30" },
+                        { value: 30, label: "30-40" },
+                        { value: 40, label: "40-50" },
+                        { value: 50, label: "50-60" },
+                        { value: 60, label: "60-70" },
+                        { value: 70, label: "70-80" },
+                        { value: 80 , label: "80-90" },
+                        { value: 90, label: "90-100" },
+                        { value: 100 , label: "> 100" },
+                        
                     ];
                 case "snowfall":
                     return [
@@ -134,6 +161,18 @@ function Legend({ variable, date }) {
                         { value: 0.65, label: "0.55-0.65" },
                         { value: 0.75, label: "0.65-0.75" },
                         { value: 0.85, label: "> 0.75" },
+                    ];
+                case "total_precipitation":
+                    return [
+                        { value: 0, label: "< 0" },
+                        { value: 0.3, label: "0-0.3" },
+                        { value: 0.5, label: "0.3-0.5" },
+                        { value: 1.5, label: "0.5-1.5" },
+                        { value: 2, label: "1.5-2" },
+                        { value: 5, label: "2-5" },
+                        { value: 10, label: "5-10" },
+                        { value: 20, label: "10-20" },
+                        { value: 32.84, label: "> 20" },
                     ];
                 default:
                     return [];

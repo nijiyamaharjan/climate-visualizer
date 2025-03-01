@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 import MapDownloader from "../downloader/MapDownloader";
 import GifDownloader from "../downloader/GifDownloader";
 import { getColor } from "../utils/colorCodes";
-import Legend from "./Legend"; 
+import Legend from "./Legend";
 
 export default function Map() {
     const [districts, setDistricts] = useState(null);
@@ -12,7 +12,7 @@ export default function Map() {
     const [selectedVariable, setSelectedVariable] = useState("tas_min");
     const [month, setMonth] = useState("06"); // Default to June
     const [year, setYear] = useState("2025"); // Default to 2025
-    const [loading, setLoading] = useState(true); 
+    const [loading, setLoading] = useState(true);
     const geoJsonLayerRef = useRef(null);
     const mapRef = useRef(null);
 
@@ -40,20 +40,20 @@ export default function Map() {
         } catch (error) {
             console.error(`Error fetching ${variable} data:`, error);
         } finally {
-            setLoading(false); 
+            setLoading(false);
         }
     };
 
     const handleMonthChange = (e) => {
         const newMonth = e.target.value;
         setMonth(newMonth);
-        setSelectedDate(`${year}-${newMonth}-01`); 
+        setSelectedDate(`${year}-${newMonth}-01`);
     };
 
     const handleYearChange = (e) => {
         const newYear = e.target.value;
         setYear(newYear);
-        setSelectedDate(`${newYear}-${month}-01`); 
+        setSelectedDate(`${newYear}-${month}-01`);
     };
 
     const handleVariableChange = (e) => {
@@ -162,13 +162,20 @@ export default function Map() {
                     onChange={handleVariableChange}
                     className="border rounded-md px-2 py-1"
                 >
-                    <option value="tas_min">Min Temperature (tas_min) K</option>
-                    <option value="tas_max">Max Temperature (tas_max) K</option>
-                    <option value="sfc_windspeed">
-                        Surface Wind Speed (sfc_windspeed) m/s
-                    </option>
+                    <option value="tas_min">Min Temperature (K)</option>
+                    <option value="tas_max">Max Temperature (K)</option>
+                    <option value="tas">Average Temperature (K)</option>
                     <option value="precipitation_rate">
-                        Precipitation Rate (pr) g/m^2/s
+                        Precipitation Rate (g/m^2/s)
+                    </option>
+                    <option value="total_precipitation">
+                        Total Precipitation (mm)
+                    </option>
+                    <option value="hurs">
+                        Relative Humidity (%)
+                    </option>
+                    <option value="huss">
+                        Specific Humidity (Mass fraction)
                     </option>
                     <option value="snowfall">
                         Snowfall (m of water equivalent)
@@ -179,6 +186,9 @@ export default function Map() {
                     <option value="spei">SPEI</option>
                     <option value="ozone">Ozone (Dobson unit)</option>
                     <option value="ndvi">NDVI</option>
+                    <option value="sfc_windspeed">
+                        Surface Wind Speed (m/s)
+                    </option>
                 </select>
             </div>
 

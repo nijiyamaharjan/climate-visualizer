@@ -13,15 +13,19 @@ const CompareDropdown = ({ onDistrictChange, onDateChange, onVariableChange }) =
   });
   const [selectedVariables, setSelectedVariables] = useState(['tas_min']);
   const variables = [
-    { value: 'tas_min', label: 'Min. Temperature' },
-    { value: 'tas_max', label: 'Max. Temperature' },
-    { value: 'sfc_windspeed', label: 'Surface Wind Speed' },
-    { value: 'precipitation_rate', label: 'Precipitation Rate' },
-    { value: 'snowfall', label: 'Snowfall' },
-    { value: 'snowmelt', label: 'Snowmelt' },
+    { value: 'tas_min', label: 'Min. Temperature (K)' },
+    { value: 'tas_max', label: 'Max. Temperature (K)' },
+    { value: 'tas', label: 'Average Temperature (K)' },
+    { value: 'precipitation_rate', label: 'Precipitation Rate (g/m^2/s)' },
+    { value: 'total_precipitaion', label: 'Total Precipitation (m)' },
+    { value: 'hurs', label: 'Relative Humidity (%)' },
+    { value: 'huss', label: 'Specific Humidity (Mass fraction)' }, 
+    { value: 'snowfall', label: 'Snowfall (m of water equivalent)' },
+    { value: 'snowmelt', label: 'Snowmelt (m of water equivalent)' },
     { value: 'spei', label: 'SPEI' },
-    { value: 'ozone', label: 'Ozone' },
-    { value: 'ndvi', label: 'NDVI' }
+    { value: 'ozone', label: 'Ozone (Dobson unit)' },
+    { value: 'ndvi', label: 'NDVI' },
+    { value: 'sfc_windspeed', label: 'Surface Wind Speed (m/s)' },
   ];
 
   const handleDateChange = (e) => {

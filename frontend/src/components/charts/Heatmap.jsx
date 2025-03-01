@@ -9,7 +9,7 @@ const generateColorLegend = (selectedVariable, minValue, maxValue) => {
     let labels = [];
     
     // Create appropriate color stops and labels based on the variable
-    if (selectedVariable === "tas_min" || selectedVariable === "tas_max") {
+    if (selectedVariable === "tas_min" || selectedVariable === "tas_max" || selectedVariable === "tas") {
         colorStops = [
             "#FF0000", "#FF3300", "#FF6600", "#FF9900", 
             "#FFCC00", "#FFFF00", "#FFFF66", "#99CCFF", 
@@ -45,7 +45,49 @@ const generateColorLegend = (selectedVariable, minValue, maxValue) => {
             "#F792B2", "#FDC9D8", "#FEE9EF", "#FFF5FA"
         ];
         labels = [maxValue.toFixed(1) + " DU", ((maxValue + minValue)/2).toFixed(1) + " DU", minValue.toFixed(1) + " DU"];
-    } else {
+    } else if (selectedVariable === "sfc_windspeed") {
+      colorStops = [
+          "#3E1A8E", "#5A2A9B", "#7F4AB8", "#9B6DCD", 
+          "#B79FDC", "#D4C1E8", "#E8D7F4", "#F1E5FB",
+          "D0D9F5", "#A3B9F2", "#7DA9EE", "#539FE5", "#1F8FD5", "#0F72B0"
+      ];
+      labels = [maxValue.toFixed(1), ((maxValue + minValue)/2).toFixed(1), minValue.toFixed(1)];
+  } else if (selectedVariable === "huss") {
+    colorStops = [
+        "#084594", "#2171b5", "#4292c6", "#6baed6", 
+        "#9ecae1", "#c6dbef", "#deebf7", "#fee090",
+        "fdae61", "#f46d43"
+    ];
+    labels = [maxValue.toFixed(1), ((maxValue + minValue)/2).toFixed(1), minValue.toFixed(1)];
+} else if (selectedVariable === "hurs") {
+  colorStops = [
+      "#54278f", "#08519c", "#3182bd", "#6baed6", 
+      "#9ecae1", "#c6dbef", "#edf8b1", "#fdae61",
+      "#f46d43", "#d73027", "#a50026"
+  ];
+  labels = [maxValue.toFixed(1), ((maxValue + minValue)/2).toFixed(1), minValue.toFixed(1)];
+} else if (selectedVariable === "snowfall") {
+  colorStops = [
+      "#003366", "#004488", "#0055AA", "#0077CC", 
+      "#3399DD", "#66BBEE", "#99DDF8", "#D8EBFD",
+      "#C7E0FA"
+  ];
+  labels = [maxValue.toFixed(1), ((maxValue + minValue)/2).toFixed(1), minValue.toFixed(1)];
+} else if (selectedVariable === "snowmelt") {
+  colorStops = [
+      "#0A0F44", "#162A5B", "#203E73", "#2B5A91", 
+      "#3A77AD", "#518ECC", "#6CA3DF", "#87B6E9",
+      "#A3C8F1", "#B7D5F6", "#C7E0FA", "#D8EBFD"
+  ];
+  labels = [maxValue.toFixed(1), ((maxValue + minValue)/2).toFixed(1), minValue.toFixed(1)];
+} else if (selectedVariable === "total_precipitation") {
+  colorStops = [
+      "#08306b", "#08519c", "#2171b5", "#4292c6", 
+      "#6baed6", "#9ecae1", "#c6dbef", "#deebf7",
+      "#f7fbff", "#ffffff"
+  ];
+  labels = [maxValue.toFixed(1), ((maxValue + minValue)/2).toFixed(1), minValue.toFixed(1)];
+} else {
         colorStops = [
             "#3E1A8E", "#7F4AB8", "#B79FDC", "#E8D7F4", 
             "#D0D9F5", "#7DA9EE", "#1F8FD5", "#0F72B0"
@@ -124,15 +166,19 @@ const HeatmapComponent = ({
 
   const getVariableName = (variable) => {
     const names = {
-      'tas_min': 'Minimum Temperature',
-      'tas_max': 'Maximum Temperature',
-      'sfc_windspeed': 'Surface Wind Speed',
-      'precipitation_rate': 'Precipitation Rate',
-      'snowfall': 'Snowfall',
-      'snowmelt': 'Snowmelt',
-      'spei': 'Standardized Precipitation-Evapotranspiration Index',
-      'ozone': 'Ozone',
-      'ndvi': 'Normalized Difference Vegetation Index'
+      'tas_min': 'Min. Temperature (K)',
+      'tas_max': 'Max. Temperature (K)',
+      'tas': 'Average Temperature (K)',
+      'hurs': 'Relative Humidity (%)',
+      'huss': 'Specific Humidity (Mass fraction)',
+      'total_precipitation': 'Total Precipitation (m)',
+      'precipitation_rate': 'Precipitation Rate (g/m^2/s)',
+      'snowfall': 'Snowfall (m of water equivalent)',
+      'snowmelt': 'Snowmelt (m of water equivalent)',
+      'spei': 'SPEI',
+      'ozone': 'Ozone (Dobson Unit)',
+      'ndvi': 'NDVI',
+      'sfc_windspeed': 'Surface Wind Speed (m/s)',
     };
     return names[variable] || variable;
   };
@@ -142,13 +188,17 @@ const HeatmapComponent = ({
     const units = {
       'tas_min': 'K',
       'tas_max': 'K',
-      'sfc_windspeed': 'm/s',
-      'precipitation_rate': 'mm/day',
-      'snowfall': 'm/day',
-      'snowmelt': 'm/day',
+      'tas': 'K',
+      'hurs': '%',
+      'huss': 'Mass fraction',
+      'total_precipitation': 'm',
+      'precipitation_rate': 'g/m^2/s',
+      'snowfall': 'm of water equivalent',
+      'snowmelt': 'm of water equivalent',
       'spei': '',
       'ozone': 'DU',
-      'ndvi': ''
+      'ndvi': '',
+      'sfc_windspeed': 'm/s',
     };
     return units[variable] || '';
   };

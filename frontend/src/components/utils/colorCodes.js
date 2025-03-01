@@ -1,5 +1,5 @@
 export const getColor = (value, selectedVariable) => {
-    if (selectedVariable === "tas_min") {
+    if (selectedVariable === "tas_min" ||selectedVariable === "tas_max" || selectedVariable === "tas" ) {
         return value > 310  
             ? "#FF0000" // Bright Red (Very Hot)
             : value > 305  
@@ -54,47 +54,70 @@ export const getColor = (value, selectedVariable) => {
             ? "#1F8FD5"
             : "#0F72B0";
     } else if (selectedVariable === "precipitation_rate") {
-        return value > 30
-            ? "#0A0F44" // Deep Indigo (highest)
-            : value > 20
-            ? "#162A5B" // Dark Navy
-            : value > 10
-            ? "#203E73" // Dark Blue
-            : value > 7
-            ? "#2B5A91" // Deep Blue
-            : value > 5    // Q3
-            ? "#3A77AD" // Medium Blue
-            : value > 4
-            ? "#518ECC" // Sky Blue
-            : value > 3    // New breakpoint
-            ? "#6CA3DF" // Soft Blue
-            : value > 2  // New breakpoint
-            ? "#87B6E9" // Muted Blue
-            : value > 1.76    // Q2
-            ? "#A3C8F1" // Light Blue
-            : value > 1.5  // New breakpoint
-            ? "#B7D5F6" // Softer Blue
-            : value > 1.2
-            ? "#C7E0FA" // Pale Blue
-            : value > 1.0
-            ? "#D8EBFD" // Very Light Blue
-            : value > 0.8 // Just below Q2
-            ? "#E9F4FF" // Lightest Blue
-            : value > 0.76
-            ? "#E0F7FF" // Very Light Blue
-            : value > 0.6
-            ? "#D1F2FF" // Soft Light Blue
-            : value > 0.5
-            ? "#A3D8FF" // Light Blue
-            : value > 0.4
-            ? "#7EC2FF" // Light Blue-Green
-            : value > 0.35
-            ? "#4AB5FF" // Soft Blue
-            : value > 0.27  // Q1
-            ? "#1B8CFF" // Bright Blue
-            : "#006BB3"; // Deep Blue (lowest)
-    }
-            else if (selectedVariable === "snowfall") {
+        return value > 0.0005  
+        ? "#08306b" // Very Dark Blue (Extreme Precipitation)
+        : value > 0.0003  
+        ? "#08519c" // Dark Blue
+        : value > 0.0002  
+        ? "#2171b5" // Medium Blue
+        : value > 0.0001  
+        ? "#4292c6" // Light Blue
+        : value > 0.00008  
+        ? "#6baed6" // Sky Blue
+        : value > 0.00005  
+        ? "#9ecae1" // Pale Blue
+        : value > 0.00002  
+        ? "#c6dbef" // Very Light Blue
+        : value > 0.00001  
+        ? "#deebf7" // Ice Blue
+        : value > 0.000005  
+        ? "#f7fbff" // Almost White (Tiny Precipitation)
+        : value > 0  
+        ? "#fcfcfc" // Faintly Visible
+        : "#ffffff"; // White (No Precipitation)
+    } else if (selectedVariable === "huss") {
+        return value > 0.034  
+            ? "#084594" // Very Dark Blue (Extremely High Humidity)
+            : value > 0.025  
+            ? "#2171b5" // Dark Blue
+            : value > 0.018  
+            ? "#4292c6" // Medium Blue
+            : value > 0.014  
+            ? "#6baed6" // Light Blue
+            : value > 0.010  
+            ? "#9ecae1" // Pale Blue
+            : value > 0.007  
+            ? "#c6dbef" // Very Light Blue
+            : value > 0.005  
+            ? "#deebf7" // Ice Blue
+            : value > 0.002  
+            ? "#fee090" // Light Yellow (Dry)
+            : value > 0.0005  
+            ? "#fdae61" // Orange (Very Dry)
+            : "#f46d43"; // Red (Extremely Dry)
+    } else if (selectedVariable === "hurs") {
+        return value > 100  
+            ? "#54278f" // Dark Purple (Extreme Humidity)
+            : value > 90  
+            ? "#08519c" // Dark Blue (Very Humid)
+            : value > 80  
+            ? "#3182bd" // Medium Blue
+            : value > 70  
+            ? "#6baed6" // Light Blue
+            : value > 60  
+            ? "#9ecae1" // Sky Blue
+            : value > 50  
+            ? "#c6dbef" // Pale Blue
+            : value > 40  
+            ? "#edf8b1" // Light Green (Moderate)
+            : value > 30  
+            ? "#fdae61" // Orange (Dry)
+            : value > 20  
+            ? "#f46d43" // Red (Very Dry)
+            : value > 10  
+            ? "#d73027" // Dark Red (Extremely Dry)
+            : "#a50026"; // Deep Red (Critical Dryness)
+    }     else if (selectedVariable === "snowfall") {
         return value > 0.01
             ? "#003366" // Deep Indigo (highest)
             : value > 0.005
@@ -183,33 +206,7 @@ export const getColor = (value, selectedVariable) => {
             : value > 240  
             ? "#FEE9EF" // Softest Pink
             : "#FFF5FA"; // Almost White (Lowest Ozone)
-    } else if (selectedVariable === "tas_max") {
-        return value > 310  
-            ? "#FF0000" // Bright Red (Very Hot)
-            : value > 305  
-            ? "#FF3300" // Vivid Red-Orange
-            : value > 300  
-            ? "#FF6600" // Orange-Red
-            : value > 295  
-            ? "#FF9900" // Orange
-            : value > 290  
-            ? "#FFCC00" // Yellow-Orange
-            : value > 285  
-            ? "#FFFF00" // Yellow
-            : value > 280  
-            ? "#FFFF66" // Light Yellow
-            : value > 275  
-            ? "#99CCFF" // Pale Blue
-            : value > 270  
-            ? "#66B3FF" // Light Blue
-            : value > 265  
-            ? "#3399FF" // Blue
-            : value > 260  
-            ? "#0066FF" // Medium Blue
-            : value > 255  
-            ? "#0033CC" // Dark Blue
-            : "#0000FF"; // Deep Blue (Coolest Temperature)
-    } else if (selectedVariable === "ndvi") {
+    }  else if (selectedVariable === "ndvi") {
         return value > 0.75  
             ? "#006400" // Dark Green (High Vegetation)
             : value > 0.65  
@@ -227,6 +224,27 @@ export const getColor = (value, selectedVariable) => {
             : value > 0.05  
             ? "#C1F0A5" // Pale Yellow-Green
             : "#F0FFF0"; // Honeydew (Very Low Vegetation)
+    } else if (selectedVariable === "total_precipitation") {
+        return value > 32.84  
+            ? "#08306b" // Very Dark Blue (Extreme Precipitation)
+            : value > 20  
+            ? "#08519c" // Dark Blue
+            : value > 10  
+            ? "#2171b5" // Medium Blue
+            : value > 5  
+            ? "#4292c6" // Light Blue
+            : value > 2  
+            ? "#6baed6" // Sky Blue
+            : value > 1.5  
+            ? "#9ecae1" // Pale Blue
+            : value > 0.5  
+            ? "#c6dbef" // Very Light Blue
+            : value > 0.3  
+            ? "#deebf7" // Ice Blue
+            : value > 0  
+            ? "#f7fbff" // Almost White (Very Low Precipitation)
+            : "#ffffff"; // White (No Precipitation)
     }
+    
     return "#cccccc";
 };
