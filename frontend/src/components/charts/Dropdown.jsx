@@ -143,12 +143,12 @@ const DataSelector = ({ onDistrictChange, onDateChange, onVariableChange }) => {
     const years = Array.from({ length: 151 }, (_, i) => (1950 + i).toString());
 
     return (
-        <div className="flex justify-center items-center space-x-6">
+        <div className="flex flex-col justify-center items-center space-y-4">
             <div>
-                <h2 className="text-xl font-bold text-center mb-2">Variable</h2>
+                <h2 className="text-lg font-bold text-center mb-2">Variable</h2>
                 <div className="relative">
                     <select
-                        className="text-md appearance-none w-48 px-4 py-3 border-2 border-gray-300 rounded-lg"
+                        className="text-md appearance-none px-4 py-3 border-2 border-gray-300 rounded-lg"
                         value={variable}
                         onChange={(e) => handleVariableChange(e)}
                     >
@@ -165,7 +165,7 @@ const DataSelector = ({ onDistrictChange, onDateChange, onVariableChange }) => {
             </div>
 
             <div>
-                <h2 className="text-xl font-bold text-center mb-2">
+                <h2 className="text-lg font-bold text-center mb-2">
                     Date Range
                 </h2>
                 <div>
@@ -239,10 +239,10 @@ const DataSelector = ({ onDistrictChange, onDateChange, onVariableChange }) => {
             </div>
 
             <div>
-                <h2 className="text-xl font-bold text-center mb-2">District</h2>
+                <h2 className="text-lg font-bold text-center mb-2">District</h2>
                 <div className="relative">
                     <select
-                        className="text-md appearance-none w-48 px-4 py-3 border-2 border-gray-300 rounded-lg"
+                        className="text-md appearance-none w-48 px-4 py-3 border-2 border-gray-300 rounded-lg mb-4"
                         onChange={(e) => onDistrictChange(e.target.value)}
                     >
                         <option value="">Select a district</option>

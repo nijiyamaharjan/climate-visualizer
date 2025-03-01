@@ -5,6 +5,8 @@ import MapDownloader from "../downloader/MapDownloader";
 import GifDownloader from "../downloader/GifDownloader";
 import { getColor } from "../utils/colorCodes";
 import Legend from "./Legend";
+import { Download } from "lucide-react";
+import { Dialog, DialogActions, DialogContent, Button } from "@mui/material";
 
 export default function Map() {
     const [districts, setDistricts] = useState(null);
@@ -16,6 +18,7 @@ export default function Map() {
     const geoJsonLayerRef = useRef(null);
     const mapRef = useRef(null);
     const [availableYears, setAvailableYears] = useState([]);
+    const [openGifModal, setOpenGifModal] = useState(false);
 
     useEffect(() => {
         fetchData(selectedDate, selectedVariable);
@@ -30,9 +33,12 @@ export default function Map() {
     useEffect(() => {
         if (variableDateRanges[selectedVariable]) {
             const { startYear, endYear } = variableDateRanges[selectedVariable];
-            const years = Array.from({ length: endYear - startYear + 1 }, (_, i) => (startYear + i).toString());
+            const years = Array.from(
+                { length: endYear - startYear + 1 },
+                (_, i) => (startYear + i).toString()
+            );
             setAvailableYears(years);
-    
+
             // Ensure the selected year is within the valid range
             if (!years.includes(year)) {
                 setYear(startYear.toString());
@@ -40,7 +46,7 @@ export default function Map() {
             }
         }
     }, [selectedVariable]);
-    
+
     const variableDateRanges = {
         tas_min: { startYear: 1950, endYear: 2100 },
         tas_max: { startYear: 1950, endYear: 2100 },
@@ -89,11 +95,15 @@ export default function Map() {
     const handleVariableChange = (e) => {
         const variable = e.target.value;
         setSelectedVariable(variable);
-    
+
         if (variableDateRanges[variable]) {
             const { startYear, endYear } = variableDateRanges[variable];
-            setAvailableYears(Array.from({ length: endYear - startYear + 1 }, (_, i) => (startYear + i).toString()));
-    
+            setAvailableYears(
+                Array.from({ length: endYear - startYear + 1 }, (_, i) =>
+                    (startYear + i).toString()
+                )
+            );
+
             // Adjust selected year if it's out of range
             if (year < startYear || year > endYear) {
                 setYear(startYear);
@@ -101,17 +111,16 @@ export default function Map() {
             }
         }
     };
-    
 
     const handleFeatureHover = (feature, layer) => {
         layer.on({
             mouseover: (e) => {
                 const value = feature.properties[selectedVariable];
-                const formattedValue = Number(value).toFixed(4)
-                
+                const formattedValue = Number(value).toFixed(4);
+
                 // Get the unit based on the selected variable
                 let unit = "";
-                switch(selectedVariable) {
+                switch (selectedVariable) {
                     case "tas_min":
                     case "tas_max":
                     case "tas":
@@ -148,13 +157,13 @@ export default function Map() {
                     default:
                         unit = "";
                 }
-                
+
                 const popupContent = `${feature.properties.district}<br>${selectedVariable}: ${formattedValue} ${unit}`;
-                
+
                 highlightFeature(e.target);
                 layer.bindPopup(popupContent).openPopup();
             },
-            
+
             mouseout: (e) => {
                 resetHighlight(e.target);
                 layer.closePopup();
@@ -274,8 +283,34 @@ export default function Map() {
                         Surface Wind Speed (m/s)
                     </option>
                 </select>
+                <MapDownloader
+                    variable={selectedVariable}
+                    date={selectedDate}
+                />
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setOpenGifModal(true)}
+                >
+                    <div className="flex gap-2">
+                        <Download />
+                        <p>Download As GIF</p>
+                    </div>
+                </Button>
             </div>
-
+            <Dialog open={openGifModal} onClose={() => setOpenGifModal(false)}>
+                <DialogContent>
+                    <GifDownloader />
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={() => setOpenGifModal(false)}
+                        color="primary"
+                    >
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
             <div className="relative w-full h-[500px]">
                 <MapContainer
                     className="absolute w-full h-full z-0 top-0"
@@ -311,8 +346,6 @@ export default function Map() {
                     <div className="loader">Loading...</div>
                 </div>
             )}
-            <MapDownloader variable={selectedVariable} date={selectedDate} />
-            <GifDownloader/>
         </div>
     );
 }

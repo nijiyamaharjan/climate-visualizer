@@ -106,8 +106,8 @@ app.post("/api/generate-map", async (req, res) => {
 
         // Set a larger viewport
         await page.setViewport({
-            width: 1200,
-            height: 800,
+            width: 1280,
+            height: 720,
             deviceScaleFactor: 2, // For better resolution
         });
 
@@ -457,8 +457,8 @@ app.post("/api/generate-map-range", async (req, res) => {
 
             // Set a larger viewport
             await page.setViewport({
-                width: 1200,
-                height: 800,
+                width: 1280,
+                height: 720,
                 deviceScaleFactor: 2, // For better resolution
             });
             // Function to format date
@@ -1138,7 +1138,7 @@ app.get("/api/districts", async (req, res) => {
 
 // Helper function to generate GIF
 const generateGif = async () => {
-    const encoder = new GIFEncoder(600, 400); // Set width and height for the GIF
+    const encoder = new GIFEncoder(1280, 720); // Set width and height for the GIF
     const outputPath = path.resolve(__dirname, "output", "output.gif"); // Use absolute path for output GIF
 
     // Create an output stream
@@ -1160,9 +1160,9 @@ const generateGif = async () => {
         console.log(imagePath);
         const img = await loadImage(imagePath);
 
-        const canvas = createCanvas(600, 400); // Set the canvas size
+        const canvas = createCanvas(1280, 720); // Set the canvas size
         const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, 600, 400); // Draw image on canvas
+        ctx.drawImage(img, 0, 0, 1280, 720); // Draw image on canvas
 
         encoder.addFrame(ctx);
     }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, CircularProgress, Alert } from '@mui/material';
+import { Download } from 'lucide-react';
 
 const MapDownloader = ({ variable, date }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -46,6 +47,7 @@ const MapDownloader = ({ variable, date }) => {
         color="primary" 
         fullWidth 
         disabled={isLoading}
+        startIcon={!isLoading ? <Download /> : null} // Use the download icon
       >
         {isLoading ? (
           <>
@@ -53,7 +55,7 @@ const MapDownloader = ({ variable, date }) => {
             Generating Map...
           </>
         ) : (
-          'Download Map'
+          'Download Map as PNG'
         )}
       </Button>
 

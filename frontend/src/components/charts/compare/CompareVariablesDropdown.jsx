@@ -50,13 +50,15 @@ const CompareVariablesDropdown = ({
     };
 
     useEffect(() => {
-                const { startYear, endYear } = variableDateRanges[selectedVariables] || { startYear: 1950, endYear: 2100 };
-                setAvailableYears(
-                    Array.from({ length: endYear - startYear + 1 }, (_, i) =>
-                        (startYear + i).toString()
-                    )
-                );
-            }, [selectedVariables]);
+        const { startYear, endYear } = variableDateRanges[
+            selectedVariables
+        ] || { startYear: 1950, endYear: 2100 };
+        setAvailableYears(
+            Array.from({ length: endYear - startYear + 1 }, (_, i) =>
+                (startYear + i).toString()
+            )
+        );
+    }, [selectedVariables]);
 
     const handleDateChange = (e) => {
         const { name, value } = e.target;
@@ -129,8 +131,6 @@ const CompareVariablesDropdown = ({
         }));
     };
 
-    
-
     const handleDistrictChange = (selectedOption) => {
         const selectedDistrict = selectedOption.value;
         setSelectedDistrict(selectedDistrict);
@@ -160,9 +160,12 @@ const CompareVariablesDropdown = ({
     const years = Array.from({ length: 151 }, (_, i) => (1950 + i).toString());
 
     return (
-        <div className="flex flex-col space-y-4">
+        <div className="flex flex-col justify-center items-center  space-y-4">
             <div>
-                <h2 className="text-lg font-bold">Select Variables</h2>
+                <h2 className="text-lg font-bold text-center mb-2">
+                    {" "}
+                    Variables
+                </h2>
                 <Select
                     isMulti
                     value={selectedVariables.map((value) => ({
@@ -180,67 +183,79 @@ const CompareVariablesDropdown = ({
             </div>
 
             <div>
-                <h2 className="text-lg font-bold">Date Range</h2>
-                <div className="flex space-x-4">
-                    <select
-                        name="startMonth"
-                        value={dateSelections.startMonth}
-                        onChange={handleDateChange}
-                        className="border rounded-md px-3 py-2"
-                    >
-                        <option value="">Month</option>
-                        {months.map((month) => (
-                            <option key={month.value} value={month.value}>
-                                {month.label}
-                            </option>
-                        ))}
-                    </select>
-                    <select
-                        name="startYear"
-                        value={dateSelections.startYear}
-                        onChange={handleDateChange}
-                        className="border rounded-md px-3 py-2"
-                    >
-                        <option value="">Year</option>
-                        {availableYears.map((year) => (
-                            <option key={year} value={year}>
-                                {year}
-                            </option>
-                        ))}
-                    </select>
+                <h2 className="text-lg font-bold text-center mb-2">
+                    Date Range
+                </h2>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Start Date
+                    </label>
+                    <div className="flex space-x-4">
+                        <select
+                            name="startMonth"
+                            value={dateSelections.startMonth}
+                            onChange={handleDateChange}
+                            className="border rounded-md px-3 py-2 w-24"
+                        >
+                            <option value="">Month</option>
+                            {months.map((month) => (
+                                <option key={month.value} value={month.value}>
+                                    {month.label}
+                                </option>
+                            ))}
+                        </select>
+                        <select
+                            name="startYear"
+                            value={dateSelections.startYear}
+                            onChange={handleDateChange}
+                            className="border rounded-md px-3 py-2"
+                        >
+                            <option value="">Year</option>
+                            {availableYears.map((year) => (
+                                <option key={year} value={year}>
+                                    {year}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
-                <div className="flex space-x-4 mt-2">
-                    <select
-                        name="endMonth"
-                        value={dateSelections.endMonth}
-                        onChange={handleDateChange}
-                        className="border rounded-md px-3 py-2"
-                    >
-                        <option value="">Month</option>
-                        {months.map((month) => (
-                            <option key={month.value} value={month.value}>
-                                {month.label}
-                            </option>
-                        ))}
-                    </select>
-                    <select
-                        name="endYear"
-                        value={dateSelections.endYear}
-                        onChange={handleDateChange}
-                        className="border rounded-md px-3 py-2"
-                    >
-                        <option value="">Year</option>
-                        {availableYears.map((year) => (
-                            <option key={year} value={year}>
-                                {year}
-                            </option>
-                        ))}
-                    </select>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        End Date
+                    </label>
+                    <div className="flex space-x-4">
+                        <select
+                            name="endMonth"
+                            value={dateSelections.endMonth}
+                            onChange={handleDateChange}
+                            className="border rounded-md px-3 py-2 w-24"
+                        >
+                            <option value="">Month</option>
+                            {months.map((month) => (
+                                <option key={month.value} value={month.value}>
+                                    {month.label}
+                                </option>
+                            ))}
+                        </select>
+                        <select
+                            name="endYear"
+                            value={dateSelections.endYear}
+                            onChange={handleDateChange}
+                            className="border rounded-md px-3 py-2"
+                        >
+                            <option value="">Year</option>
+                            {availableYears.map((year) => (
+                                <option key={year} value={year}>
+                                    {year}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
             </div>
 
             <div>
-                <h2 className="text-lg font-bold">Select District</h2>
+                <h2 className="text-lg font-bold text-center mb-2">District</h2>{" "}
                 <Select
                     value={{ value: selectedDistrict, label: selectedDistrict }}
                     onChange={handleDistrictChange}
