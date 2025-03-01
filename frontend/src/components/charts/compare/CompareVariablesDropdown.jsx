@@ -195,7 +195,7 @@ const CompareVariablesDropdown = ({
                             name="startMonth"
                             value={dateSelections.startMonth}
                             onChange={handleDateChange}
-                            className="border rounded-md px-3 py-2 w-24"
+                            className="border rounded-md px-3 py-2 w-32"
                         >
                             <option value="">Month</option>
                             {months.map((month) => (
@@ -228,7 +228,7 @@ const CompareVariablesDropdown = ({
                             name="endMonth"
                             value={dateSelections.endMonth}
                             onChange={handleDateChange}
-                            className="border rounded-md px-3 py-2 w-24"
+                            className="border rounded-md px-3 py-2 w-32"
                         >
                             <option value="">Month</option>
                             {months.map((month) => (
@@ -255,17 +255,23 @@ const CompareVariablesDropdown = ({
             </div>
 
             <div>
-                <h2 className="text-lg font-bold text-center mb-2">District</h2>{" "}
-                <Select
-                    value={{ value: selectedDistrict, label: selectedDistrict }}
-                    onChange={handleDistrictChange}
-                    options={districts.map((district) => ({
-                        value: district,
-                        label: district,
-                    }))}
-                    className="w-full"
-                    classNamePrefix="react-select"
-                />
+                <h2 className="text-lg font-bold text-center mb-2">District</h2>
+                <div className="relative">
+                    <select
+                        className="text-md appearance-none w-48 px-4 py-3 border-2 border-gray-300 rounded-lg mb-4"
+                        onChange={(e) => onDistrictChange(e.target.value)}
+                    >
+                        <option value="">Select a district</option>
+                        {districts.map((district) => (
+                            <option key={district} value={district}>
+                                {district}
+                            </option>
+                        ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
+                        <ChevronDown size={24} />
+                    </div>
+                </div>
             </div>
         </div>
     );

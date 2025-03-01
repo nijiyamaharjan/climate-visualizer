@@ -6,8 +6,7 @@ import GifDownloader from "../downloader/GifDownloader";
 import { getColor } from "../utils/colorCodes";
 import Legend from "./Legend";
 import { Download } from "lucide-react";
-import { Dialog, DialogActions, DialogContent, Button } from "@mui/material";
-
+import { Button, Dialog, DialogActions, DialogContent, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
 export default function Map() {
     const [districts, setDistricts] = useState(null);
     const [selectedDate, setSelectedDate] = useState("2025-06-01");
@@ -222,130 +221,123 @@ export default function Map() {
         [30.447, 88.201],
     ];
 
+    const SelectInput = ({ label, value, onChange, options, width = "w-32" }) => (
+        <FormControl variant="outlined" size="small" className={`${width} min-w-[120px]`}>
+            <InputLabel>{label}</InputLabel>
+            <Select value={value} onChange={onChange} label={label}>
+                {options.map(({ value, label }) => (
+                    <MenuItem key={value} value={value}>
+                        {label}
+                    </MenuItem>
+                ))}
+            </Select>
+        </FormControl>
+    );    
+
     return (
         <div className="relative">
-            <div className="p-4 bg-white shadow-md rounded-lg mb-4 flex justify-start gap-10 items-center">
-                <label>
-                    <select value={month} onChange={handleMonthChange}>
-                        {months.map(({ value, label }) => (
-                            <option key={value} value={value}>
-                                {label}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-
-                <label>
-                    <select value={year} onChange={handleYearChange}>
-                        {availableYears.map((yearOption) => (
-                            <option key={yearOption} value={yearOption}>
-                                {yearOption}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-
-                <label
-                    htmlFor="variable-select"
-                    className="font-medium text-gray-700"
-                >
-                    Select Variable:
-                </label>
-                <select
-                    id="variable-select"
+        {/* Controls Panel */}
+        <div className="p-4 bg-white shadow-lg rounded-xl mb-4 flex flex-wrap gap-4 items-center justify-between border border-gray-200">
+            <div className="flex gap-4 flex-wrap">
+                <SelectInput
+                    label="Month"
+                    value={month}
+                    onChange={handleMonthChange}
+                    options={months}
+                    width="w-32"
+                />
+                <SelectInput
+                    label="Year"
+                    value={year}
+                    onChange={handleYearChange}
+                    options={availableYears.map((y) => ({ value: y, label: y }))}
+                    width="w-24"
+                />
+                <SelectInput
+                    label="Variable"
                     value={selectedVariable}
                     onChange={handleVariableChange}
-                    className="border rounded-md px-2 py-1"
-                >
-                    <option value="tas_min">Min Temperature (K)</option>
-                    <option value="tas_max">Max Temperature (K)</option>
-                    <option value="tas">Average Temperature (K)</option>
-                    <option value="precipitation_rate">
-                        Precipitation Rate (g/m^2/s)
-                    </option>
-                    <option value="total_precipitation">
-                        Total Precipitation (mm)
-                    </option>
-                    <option value="hurs">Relative Humidity (%)</option>
-                    <option value="huss">
-                        Specific Humidity (Mass fraction)
-                    </option>
-                    <option value="snowfall">
-                        Snowfall (m of water equivalent)
-                    </option>
-                    <option value="snowmelt">
-                        Snowmelt (m of water equivalent)
-                    </option>
-                    <option value="spei">SPEI</option>
-                    <option value="ozone">Ozone (Dobson unit)</option>
-                    <option value="ndvi">NDVI</option>
-                    <option value="sfc_windspeed">
-                        Surface Wind Speed (m/s)
-                    </option>
-                </select>
-                <MapDownloader
-                    variable={selectedVariable}
-                    date={selectedDate}
+                    options={[
+                        { value: "tas_min", label: "Min Temperature (K)" },
+                        { value: "tas_max", label: "Max Temperature (K)" },
+                        { value: "tas", label: "Average Temperature (K)" },
+                        { value: "precipitation_rate", label: "Precipitation Rate (g/m²/s)" },
+                        { value: "total_precipitation", label: "Total Precipitation (mm)" },
+                        { value: "hurs", label: "Relative Humidity (%)" },
+                        { value: "huss", label: "Specific Humidity (Mass fraction)" },
+                        { value: "snowfall", label: "Snowfall (m of water equivalent)" },
+                        { value: "snowmelt", label: "Snowmelt (m of water equivalent)" },
+                        { value: "spei", label: "SPEI" },
+                        { value: "ozone", label: "Ozone (Dobson unit)" },
+                        { value: "ndvi", label: "NDVI" },
+                        { value: "sfc_windspeed", label: "Surface Wind Speed (m/s)" },
+                    ]}
+                    width="w-80"
                 />
+            </div>
+            <div className="flex gap-4 ">
+                <MapDownloader variable={selectedVariable} date={selectedDate} />
                 <Button
                     variant="contained"
                     color="primary"
                     onClick={() => setOpenGifModal(true)}
+                    className="flex gap-2 shadow-md"
                 >
-                    <div className="flex gap-2">
-                        <Download />
-                        <p>Download As GIF</p>
-                    </div>
+                    <Download />
+                    <span>Download As GIF</span>
                 </Button>
             </div>
-            <Dialog open={openGifModal} onClose={() => setOpenGifModal(false)}>
-                <DialogContent>
-                    <GifDownloader />
-                </DialogContent>
-                <DialogActions>
-                    <Button
-                        onClick={() => setOpenGifModal(false)}
-                        color="primary"
-                    >
-                        Close
-                    </Button>
-                </DialogActions>
-            </Dialog>
-            <div className="relative w-full h-[500px]">
-                <MapContainer
-                    className="absolute w-full h-full z-0 top-0"
-                    center={[28.3949, 84.124]}
-                    zoom={7}
-                    zoomControl={true}
-                    scrollWheelZoom={true}
-                    maxBounds={nepalBounds}
-                    maxZoom={12}
-                    minZoom={7}
-                    ref={mapRef}
-                >
-                    <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png" />
-                    <LayersControl position="topright">
-                        <LayersControl.Overlay checked name="Districts">
-                            {districts && (
-                                <GeoJSON
-                                    ref={geoJsonLayerRef}
-                                    data={districts}
-                                    style={style}
-                                    onEachFeature={handleFeatureHover}
-                                    key={selectedVariable}
-                                />
-                            )}
-                        </LayersControl.Overlay>
-                    </LayersControl>
-                    <Legend variable={selectedVariable} date={selectedDate} />
-                </MapContainer>
-            </div>
-
-            {loading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50">
-                    <div className="loader">Loading...</div>
-                </div>
-            )}
         </div>
-    );
+
+        {/* GIF Download Modal */}
+        <Dialog open={openGifModal} onClose={() => setOpenGifModal(false)}>
+            <DialogContent>
+                <GifDownloader />
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => setOpenGifModal(false)} color="primary">
+                    Close
+                </Button>
+            </DialogActions>
+        </Dialog>
+
+        {/* Map Section */}
+        <div className="relative w-full h-[550px] bg-gray-100 shadow-md rounded-lg overflow-hidden">
+            <MapContainer
+                className="absolute w-full h-full z-0 top-0"
+                center={[28.3949, 84.124]}
+                zoom={7}
+                zoomControl={true}
+                scrollWheelZoom={true}
+                maxBounds={nepalBounds}
+                maxZoom={12}
+                minZoom={7}
+                ref={mapRef}
+            >
+                <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png" />
+                <LayersControl position="topright">
+                    <LayersControl.Overlay checked name="Districts">
+                        {districts && (
+                            <GeoJSON
+                                ref={geoJsonLayerRef}
+                                data={districts}
+                                style={style}
+                                onEachFeature={handleFeatureHover}
+                                key={selectedVariable}
+                            />
+                        )}
+                    </LayersControl.Overlay>
+                </LayersControl>
+                <Legend variable={selectedVariable} date={selectedDate} />
+            </MapContainer>
+        </div>
+
+        {/* Loading Indicator */}
+        {loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50">
+                <div className="loader">Loading...</div>
+            </div>
+        )}
+    </div>
+);
 }
