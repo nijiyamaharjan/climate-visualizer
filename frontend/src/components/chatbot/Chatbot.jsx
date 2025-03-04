@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Send, X, MessageSquare } from "lucide-react";
 
-export default function Chatbot() {
+export default function Chatbot({variable}) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -18,7 +18,7 @@ export default function Chatbot() {
     if (isOpen && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [isOpen]);
+  }, [isOpen, variable]);
 
   useEffect(() => {
     return () => {
@@ -55,8 +55,26 @@ export default function Chatbot() {
     }, 15000); 
 
     try {
+      const chat = ['tas', 'tasmax', 'tasmin', 'pr', 'hurs', 'huss', 'sfcWind']
+    const database = ['tas', 'tas_max', 'tas_min', 'precipitation_rate', 'hurs', 'huss', 'sfc_windspeed']
+    let variableEndpoint
+      if (variable == 'tas_max') {
+        variableEndpoint = 'tasmax'
+      } else if (variable == 'tas_min') {
+        variableEndpoint = 'tasmin'
+      } else if (variable == 'precipitation_rate') {
+        variableEndpoint = 'pr'
+      } else if (variable == 'sfc_windspeed') {
+        variableEndpoint = 'sfcWind'
+      } else if (variable == 'tas' || variable == 'huss' || variable == 'hurs') {
+        variableEndpoint = variable
+      } else {
+        variableEndpoint = ''
+      }
+
+      console.log(variableEndpoint, 'endpoint')
       // API call
-      const response = await fetch("http://api-endpoint/query", {
+      const response = await fetch(`http://api-endpoint/${variableEndpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userInput }),
@@ -131,7 +149,7 @@ export default function Chatbot() {
           <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
             {messages.length === 0 ? (
               <div className="text-center text-gray-500 mt-10">
-                <p>👋 Hi there! How can I help you today?</p>
+                <p>👋 Ask anything about the currently selected variable.</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -176,7 +194,7 @@ export default function Chatbot() {
                 ref={inputRef}
                 type="text"
                 className="flex-1 border border-gray-300 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Type a message..."
+                placeholder="Ask anything about the currently selected variable..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && sendMessage()}

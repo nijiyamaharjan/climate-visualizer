@@ -17,7 +17,7 @@ import {
     InputLabel,
 } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-export default function Map() {
+export default function Map({ onDropdown }) {
     const [districts, setDistricts] = useState(null);
     const [selectedDate, setSelectedDate] = useState("2025-06-01");
     const [selectedVariable, setSelectedVariable] = useState("tas_min");
@@ -78,9 +78,7 @@ export default function Map() {
             const response = await fetch(
                 `http://localhost:5000/api/data?variable=${variable}&date=${date}`
             );
-            console.log("variable ", variable);
             const data = await response.json();
-            console.log("data ", data);
             setDistricts(data);
         } catch (error) {
             console.error(`Error fetching ${variable} data:`, error);
@@ -155,6 +153,7 @@ export default function Map() {
     const handleVariableChange = (e) => {
         const variable = e.target.value;
         setSelectedVariable(variable);
+        onDropdown(variable)
 
         if (variableDateRanges[variable]) {
             const { startYear, endYear } = variableDateRanges[variable];

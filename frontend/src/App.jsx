@@ -15,6 +15,7 @@ import Chatbot from "./components/chatbot/Chatbot";
 
 export default function App() {
     const [selectedRegion, setSelectedRegion] = useState(null);
+    const [dropdownVariable, setDropdownVariable] = useState("tas_min")
     const [selectedDistrict, setSelectedDistrict] = useState(null);
     const [selectedVariable, setSelectedVariable] = useState("tas_min");
     const [multipleDistricts, setMultipleDistricts] = useState([]);
@@ -39,6 +40,7 @@ export default function App() {
     const handleVariableChange = (selectedVariables) => {
         setMultipleVariables(selectedVariables);
     };
+
 
     return (
         <div className="min-h-screen bg-gray-100 p-4">
@@ -66,7 +68,7 @@ export default function App() {
                     {/* Map Tab */}
                     {selectedTab === 1 && (
                         <div>
-                            <Map onRegionSelect={setSelectedRegion} />
+                            <Map onRegionSelect={setSelectedRegion} onDropdown={setDropdownVariable}/>
                         </div>
                     )}
 
@@ -175,7 +177,7 @@ export default function App() {
                         </div>
                     )}
                 </div>
-                <Chatbot />
+                <Chatbot variable={dropdownVariable}/>
             </div>
         </div>
     );
