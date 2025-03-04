@@ -34,14 +34,14 @@ export default function Chatbot({variable}) {
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
-
+  
     const userMessage = { sender: "user", text: input };
     const userInput = input;
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
-
-    // Show timeout after 15 seconds 
+  
+    // Show timeout after 15 seconds
     timeoutRef.current = setTimeout(() => {
       setIsLoading(false);
       setMessages((prev) => [
@@ -52,50 +52,61 @@ export default function Chatbot({variable}) {
         },
       ]);
       timeoutRef.current = null;
-    }, 15000); 
-
+    }, 20000); // 20 seconds instead of 200000 (which is too long)
+  
     try {
-      const chat = ['tas', 'tasmax', 'tasmin', 'pr', 'hurs', 'huss', 'sfcWind']
-    const database = ['tas', 'tas_max', 'tas_min', 'precipitation_rate', 'hurs', 'huss', 'sfc_windspeed']
-    let variableEndpoint
-      if (variable == 'tas_max') {
-        variableEndpoint = 'tasmax'
-      } else if (variable == 'tas_min') {
-        variableEndpoint = 'tasmin'
-      } else if (variable == 'precipitation_rate') {
-        variableEndpoint = 'pr'
-      } else if (variable == 'sfc_windspeed') {
-        variableEndpoint = 'sfcWind'
-      } else if (variable == 'tas' || variable == 'huss' || variable == 'hurs') {
-        variableEndpoint = variable
-      } else {
-        variableEndpoint = ''
+      let variableEndpoint = "";
+      const mapping = {
+        tas_max: "tasmax",
+        tas_min: "tasmin",
+        precipitation_rate: "pr",
+        sfc_windspeed: "sfcWind",
+        tas: "tas",
+        huss: "huss",
+        hurs: "hurs",
+      };
+  
+      if (variable in mapping) {
+        variableEndpoint = mapping[variable];
       }
-
-      console.log(variableEndpoint, 'endpoint')
-      // API call
-      const response = await fetch(`http://api-endpoint/${variableEndpoint}`, {
+  
+      console.log(variableEndpoint, "endpoint");
+  
+      const payload = {
+        query: userInput,
+        top_k: 5,
+        variable: variableEndpoint,
+      };
+  
+      console.log("Sending request to:", `http://localhost:8000/query/${variableEndpoint}`);
+      console.log("Request payload:", payload);
+  
+      const response = await fetch(`http://localhost:8000/query/${variableEndpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userInput }),
+        body: JSON.stringify(payload),
       });
-      
-    //   // mockApiResponse for testing
-    //   const response = await mockApiResponse(1000); 
-    //   const data = await response.json();
-      
+  
+      if (!response.ok) {
+        throw new Error(`Server responded with status: ${response.status}`);
+      }
+  
+      const data = await response.json(); // Extract JSON response
+  
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
-        
+  
         setIsLoading(false);
-        setMessages((prev) => [...prev, { sender: "bot", text: data.reply }]);
+        setMessages((prev) => [...prev, { sender: "bot", text: data.response || "No response from bot." }]);
       }
     } catch (error) {
+      console.error("Fetch error:", error);
+      
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
-        
+  
         setIsLoading(false);
         setMessages((prev) => [
           ...prev,
@@ -107,9 +118,10 @@ export default function Chatbot({variable}) {
       }
     }
   };
+  
 
   // Mock API response with a configurable delay
-  const mockApiResponse = (delay = 20000) => {
+  const mockApiResponse = (delay = 200000) => {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({ 
@@ -132,7 +144,7 @@ export default function Chatbot({variable}) {
     <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end">
       {/* Chat Window */}
       {isOpen && (
-        <div className="w-80 md:w-96 h-96 bg-white rounded-lg flex flex-col mb-4 shadow-2xl border border-gray-200 overflow-hidden transition-all duration-300 ease-in-out">
+        <div className="w-80 md:w-96 h-[35rem] bg-white rounded-lg flex flex-col mb-4 shadow-2xl border border-gray-200 overflow-hidden transition-all duration-300 ease-in-out">
           {/* Header */}
           <div className="bg-blue-600 text-white p-3 flex justify-between items-center">
             <h3 className="font-medium">Chat Assistant</h3>

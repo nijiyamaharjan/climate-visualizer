@@ -183,7 +183,7 @@ export default function Map() {
                     <option value="snowmelt">
                         Snowmelt (m of water equivalent)
                     </option>
-                    <option value="spei">SPEI</option>
+                    {/* <option value="spei">SPEI</option> */}
                     <option value="ozone">Ozone (Dobson unit)</option>
                     <option value="ndvi">NDVI</option>
                 </select>

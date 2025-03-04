@@ -18,12 +18,12 @@ export default function GenerateMapRange() {
     tas_max: { startYear: 1950, endYear: 2100 },
     tas: { startYear: 1950, endYear: 2100 },
     precipitation_rate: { startYear: 1950, endYear: 2100 },
-    total_precipitation: { startYear: 1950, endYear: 2025 },
+    total_precipitation: { startYear: 1950, endYear: 2100 },
     hurs: { startYear: 1950, endYear: 2100 },
     huss: { startYear: 1950, endYear: 2100 },
     snowfall: { startYear: 1950, endYear: 2023 },
     snowmelt: { startYear: 1950, endYear: 2023 },
-    spei: { startYear: 1985, endYear: 2020 },
+    // spei: { startYear: 1985, endYear: 2020 },
     ozone: { startYear: 1978, endYear: 2025 },
     ndvi: { startYear: 1981, endYear: 2013 },
     sfc_windspeed: { startYear: 1950, endYear: 2100 },
@@ -163,7 +163,7 @@ export default function GenerateMapRange() {
                     <option value="snowmelt">
                         Snowmelt (m of water equivalent)
                     </option>
-                    <option value="spei">SPEI</option>
+                    {/* <option value="spei">SPEI</option> */}
                     <option value="ozone">Ozone (Dobson unit)</option>
                     <option value="ndvi">NDVI</option>
                     <option value="sfc_windspeed">

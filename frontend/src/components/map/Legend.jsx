@@ -121,19 +121,19 @@ function Legend({ variable, date }) {
                         { value: 0.01, label: "0.005-0.01" },
                         { value: 0.02, label: "> 0.01" },
                     ];
-                case "spei":
-                    return [
-                        { value: -3, label: "< -3" },
-                        { value: -2, label: "-3 to -2" },
-                        { value: -0.8, label: "-2 to -0.8" },
-                        { value: -0.1, label: "-0.8 to -0.1" },
-                        { value: 0.1, label: "-0.1 to 0.1" },
-                        { value: 0.6, label: "0.1 to 0.6" },
-                        { value: 1, label: "0.6 to 1" },
-                        { value: 2, label: "1 to 2" },
-                        { value: 3, label: "2 to 3" },
-                        { value: 4, label: "> 3" },
-                    ];
+                // case "spei":
+                //     return [
+                //         { value: -3, label: "< -3" },
+                //         { value: -2, label: "-3 to -2" },
+                //         { value: -0.8, label: "-2 to -0.8" },
+                //         { value: -0.1, label: "-0.8 to -0.1" },
+                //         { value: 0.1, label: "-0.1 to 0.1" },
+                //         { value: 0.6, label: "0.1 to 0.6" },
+                //         { value: 1, label: "0.6 to 1" },
+                //         { value: 2, label: "1 to 2" },
+                //         { value: 3, label: "2 to 3" },
+                //         { value: 4, label: "> 3" },
+                //     ];
                 case "ozone":
                     return [
                         { value: 240, label: "< 240" },
@@ -194,8 +194,8 @@ function Legend({ variable, date }) {
                     return "Snowfall (m of water equivalent)";
                 case "snowmelt":
                     return "Snowmelt (m of water equivalent)";
-                case "spei":
-                    return "SPEI";
+                // case "spei":
+                //     return "SPEI";
                 case "ozone":
                     return "Ozone (Dobson unit)";
                 case "ndvi":

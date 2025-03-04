@@ -61,12 +61,12 @@ export default function Map({ onDropdown }) {
         tas_max: { startYear: 1950, endYear: 2100 },
         tas: { startYear: 1950, endYear: 210 },
         precipitation_rate: { startYear: 1950, endYear: 2100 },
-        total_precipitation: { startYear: 1950, endYear: 2025 },
+        total_precipitation: { startYear: 1950, endYear: 2100 },
         hurs: { startYear: 1950, endYear: 2100 },
         huss: { startYear: 1950, endYear: 2100 },
         snowfall: { startYear: 1950, endYear: 2023 },
         snowmelt: { startYear: 1950, endYear: 2023 },
-        spei: { startYear: 1985, endYear: 2020 },
+        // spei: { startYear: 1985, endYear: 2020 },
         ozone: { startYear: 1978, endYear: 2025 },
         ndvi: { startYear: 1981, endYear: 2013 },
         sfc_windspeed: { startYear: 1950, endYear: 2100 },
@@ -201,9 +201,9 @@ export default function Map({ onDropdown }) {
                     case "snowmelt":
                         unit = "m water eq.";
                         break;
-                    case "spei":
-                        unit = "";
-                        break;
+                    // case "spei":
+                    //     unit = "";
+                    //     break;
                     case "ozone":
                         unit = "DU";
                         break;
@@ -419,7 +419,7 @@ export default function Map({ onDropdown }) {
                                 value: "snowmelt",
                                 label: "Snowmelt (m of water equivalent)",
                             },
-                            { value: "spei", label: "SPEI" },
+                            // { value: "spei", label: "SPEI" },
                             { value: "ozone", label: "Ozone (Dobson unit)" },
                             { value: "ndvi", label: "NDVI" },
                             {

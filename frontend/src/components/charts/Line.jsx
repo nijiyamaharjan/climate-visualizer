@@ -46,7 +46,7 @@ const getVariableName = (variable) => {
         precipitation_rate: "Precipitation Rate (g/m^2/s)",
         snowfall: "Snowfall (m of water equivalent)",
         snowmelt: "Snowmelt (m of water equivalent)",
-        spei: "SPEI",
+        // spei: "SPEI",
         ozone: "Ozone (Dobson Unit)",
         ndvi: "NDVI",
         sfc_windspeed: "Surface Wind Speed (m/s)",
