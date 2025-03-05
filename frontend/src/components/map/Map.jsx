@@ -64,11 +64,11 @@ export default function Map({ onDropdown }) {
         total_precipitation: { startYear: 1950, endYear: 2100 },
         hurs: { startYear: 1950, endYear: 2100 },
         huss: { startYear: 1950, endYear: 2100 },
-        snowfall: { startYear: 1950, endYear: 2023 },
-        snowmelt: { startYear: 1950, endYear: 2023 },
+        snowfall: { startYear: 1950, endYear: 2100 },
+        snowmelt: { startYear: 1950, endYear: 2100 },
         // spei: { startYear: 1985, endYear: 2020 },
-        ozone: { startYear: 1978, endYear: 2025 },
-        ndvi: { startYear: 1981, endYear: 2013 },
+        ozone: { startYear: 1978, endYear: 2100},
+        ndvi: { startYear: 1981, endYear: 2100 },
         sfc_windspeed: { startYear: 1950, endYear: 2100 },
     };
 
