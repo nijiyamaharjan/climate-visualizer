@@ -17,16 +17,16 @@ An interactive platform for analyzing and predicting climate patterns in Nepal u
 - **AI**: RAG (text-embedding-ada-002 + GPT-4o)
 
 ## Screenshots
-Map Visualization
+### Map Visualization
 ![Interactive Map](images/map.png)
 
-Comparison
+### Comparison
 ![Districts Comparison](images/compare-districts.png)
 ![Variables Comparison](images/compare-variables.png)
 
-Charts
+### Charts
 ![Chart](images/charts.png)
 ![Heatmap](images/heatmap.png)
 
-Chatbot Interaction
+### Chatbot Interaction
 ![Chatbot](images/chat.png)
